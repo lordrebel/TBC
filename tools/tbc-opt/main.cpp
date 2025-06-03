@@ -1,3 +1,12 @@
+/*
+ * (C) Copyright 2025, Imvision Co., Ltd
+ * This file is classified as confidential level C2 within Imvision
+ * @Date: 2025-06-03 11:45:51
+ * Change Logs:
+ * 
+ * Date           Author         Notes
+ * ${now_date}          wangjiahao          initialize 
+ */
 //===- mlir-opt.cpp - MLIR Optimizer Driver -------------------------------===//
 //
 // Copyright (C) 2022 Sophgo Technologies Inc.  All rights reserved.
@@ -11,7 +20,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "InitAll.h"
+#include "initAll.h"
 #include "mlir/Tools/mlir-opt/MlirOptMain.h"
 using namespace mlir;
 

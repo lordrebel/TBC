@@ -1,7 +1,7 @@
 
 
 #include "support/module.h"
-#include "support/Patterns.h"
+#include "support/patterns.h"
 
 using namespace tbc::ops;
 
