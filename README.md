@@ -3,9 +3,9 @@
  * This file is classified as confidential level C2 within Imvision
  * @Date: 2025-06-03 11:45:51
  * Change Logs:
- * 
+ *
  * Date           Author         Notes
- * ${now_date}          wangjiahao          initialize 
+ * ${now_date}          wangjiahao          initialize
 -->
 # TODO
 ## pepare env
@@ -42,6 +42,6 @@ sudo apt-get install libgomp-dev
 
 ### 4. build
 ```bash
-mkdir -p build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=${INSTALL_PATH} && cmake --build . --target install
+bash build.sh
 ```
 ## how to use

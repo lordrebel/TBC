@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef TBS_Operator_OpS
-#define TBS_Operator_OpS
+#ifndef TBC_Operator_OpS
+#define TBC_Operator_OpS
 
 include "mlir/IR/AttrTypeBase.td"
 include "mlir/IR/EnumAttr.td"
