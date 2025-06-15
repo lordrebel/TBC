@@ -1,12 +1,3 @@
-<!--
- * (C) Copyright 2025, Imvision Co., Ltd
- * This file is classified as confidential level C2 within Imvision
- * @Date: 2025-06-03 11:45:51
- * Change Logs:
- *
- * Date           Author         Notes
- * ${now_date}          wangjiahao          initialize
--->
 # TODO
 ## pepare env
 ```bash
@@ -53,3 +44,9 @@ env env.source
 model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platform onnx - --mlir ./lenet.mlir
 ```
 3. for more details see `model_transform.py --help`
+
+## TODO List
+- [ ] test fp8/fp16 onnx model import
+- [ ] add svjson converter
+- [ ] add platform dependent pass for optmize imported model
+- [ ] kernel dialect design
