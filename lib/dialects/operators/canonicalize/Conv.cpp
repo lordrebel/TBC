@@ -190,10 +190,6 @@ struct Conv1x1Convkxk2dMerge : public OpRewritePattern<ConvOp> {
         return failure();
       }
 
-      if (p.do_relu || prep.do_relu) {
-        return failure();
-      }
-
       auto Filterop = op.getFilter().getDefiningOp<ops::WeightOp>();
       auto Filterop_f32 = Filterop.read<float>();
       std::vector<int64_t> filterShape = module::getShape(op.getFilter());

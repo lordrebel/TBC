@@ -45,3 +45,11 @@ sudo apt-get install libgomp-dev
 bash build.sh
 ```
 ## how to use
+### simple test
+1. download lenet.onnx from [here](https://github.com/ONNC/onnc-tutorial/blob/master/models/lenet/lenet.onnx)
+2. run
+```bash
+env env.source
+model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platform onnx - --mlir ./lenet.mlir
+```
+3. for more details see `model_transform.py --help`

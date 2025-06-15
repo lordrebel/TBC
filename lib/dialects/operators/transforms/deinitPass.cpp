@@ -21,7 +21,7 @@ public:
   DeinitPass() {}
   void runOnOperation() override {
     auto compile_phase = module::getCompilePhase();
-    if (compile_phase >= utils::CompilePhase::IMPORTED) {
+    if (compile_phase >= utils::CompilePhase::HAL_ADDRESSED) {
       return;
     }
     module::removeUnusedOp();

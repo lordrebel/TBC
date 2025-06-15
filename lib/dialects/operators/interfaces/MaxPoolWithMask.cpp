@@ -33,8 +33,6 @@ pool_attr_t ops::MaxPoolWithMaskOp::parseParam() {
   p.pad_h_after = pad->at(2);
   p.pad_w_after = pad->at(3);
   p.pad_value = 0;
-  p.do_relu = getDoRelu();
-  p.relu_limit = getReluLimit().convertToDouble();
   p.is_global = p.id == p.kd && p.ih == p.kh && p.iw == p.kw && p.od == 1 &&
                 p.oh == 1 && p.ow == 1;
   p.count_include_pad = getCountIncludePad();

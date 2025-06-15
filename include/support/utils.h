@@ -29,7 +29,6 @@ typedef struct {
   int64_t weight_is_coeff;
   bool has_bias;
   bool is_dw;
-  bool do_relu;
   double relu_limit;
   int use_winograd;
   int use_3ic_optimize;
@@ -66,7 +65,6 @@ typedef struct {
   int64_t pad_value;
   int64_t g;
   bool with_bias;
-  bool do_relu;
   double relu_limit;
   bool is_dw;
   bool pad_insert_is_const;
@@ -79,7 +77,6 @@ typedef struct {
   int64_t N;
   int64_t batch_low;
   bool with_bias;
-  bool do_relu;
   double relu_limit;
   bool left_transpose;
   bool right_transpose;
@@ -112,7 +109,6 @@ typedef struct {
   int64_t pad_w;
   int64_t pad_w_after;
   int64_t pad_value;
-  bool do_relu;
   double relu_limit;
   bool is_global;
   bool count_include_pad;
@@ -194,7 +190,6 @@ typedef struct {
   int64_t kernel_zp;
   bool use_mask;
   bool has_bias;
-  bool do_relu;
   bool is_dw;
   double relu_limit;
 } deform_conv2d_attr_t;

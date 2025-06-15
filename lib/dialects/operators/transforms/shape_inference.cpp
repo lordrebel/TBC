@@ -147,5 +147,5 @@ private:
 std::unique_ptr<OperationPass<ModuleOp>> createShapeInferPass() {
   return std::make_unique<ShapeInferPass>();
 }
-} // namespace top
-} // namespace tpu_mlir
+} // namespace operators
+} // namespace tbc

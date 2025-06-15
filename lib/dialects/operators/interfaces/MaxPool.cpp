@@ -67,7 +67,6 @@ pool_attr_t ops::MaxPoolOp::parseParam() {
     p.pad_h_after = pad->at(1);
   }
   p.pad_value = getPadValue();
-  p.do_relu = false;
   p.relu_limit = 1.0;
   p.is_global = p.id == p.kd && p.ih == p.kh && p.iw == p.kw && p.od == 1 &&
                 p.oh == 1 && p.ow == 1;

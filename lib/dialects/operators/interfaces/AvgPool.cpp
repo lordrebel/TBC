@@ -60,8 +60,6 @@ pool_attr_t ops::AvgPoolOp::parseParam() {
     p.pad_h_after = pad->at(1);
   }
   p.pad_value = getPadValue();
-  p.do_relu = getDoRelu();
-  p.relu_limit = getReluLimit().convertToDouble();
   p.is_global = p.id == p.kd && p.ih == p.kh && p.iw == p.kw && p.od == 1 &&
                 p.oh == 1 && p.ow == 1;
   p.count_include_pad = getCountIncludePad();

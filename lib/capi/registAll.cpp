@@ -10,3 +10,7 @@ void mlirRegisterAllDialects(MlirDialectRegistry registry) {
   static_cast<mlir::DialectRegistry *>(registry.ptr)
       ->insert<mlir::func::FuncDialect, tbc::ops::OperatorDialect>();
 }
+void register_llvm_translations(MlirContext &context) {
+
+}
+

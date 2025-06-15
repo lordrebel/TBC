@@ -360,9 +360,7 @@ class Operator_PoolOp <string mnemonic> : Operator_Op<mnemonic> {
     OptionalAttr<AutoPadModeAttr>:$auto_pad, // only used in shape infer
     DefaultValuedAttr<BoolAttr, "true">:$keepdims,
     DefaultValuedAttr<I64Attr, "0">:$pad_value,
-    DefaultValuedAttr<BoolAttr, "false">:$count_include_pad,
-    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
-    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+    DefaultValuedAttr<BoolAttr, "false">:$count_include_pad
   );
 
   let results = (outs AnyTensor:$output);
@@ -1353,9 +1351,7 @@ def Operator_DivOp: Operator_Op<"Div"> {
 
   let arguments = (ins
     Variadic<AnyTensor>:$inputs,
-    DefaultValuedAttr<BoolAttr, "false">:$is_reverse,
-    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
-    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+    DefaultValuedAttr<BoolAttr, "false">:$is_reverse
   );
 
   let results = (outs AnyTensor:$output);

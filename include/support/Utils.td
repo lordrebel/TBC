@@ -27,7 +27,8 @@ def Module_Phase: I32EnumAttr<"CompilePhase", "module state",[
       I32EnumAttrCase<"KERNEL_OPTED", 3>,
       I32EnumAttrCase<"HAL", 4>,
       I32EnumAttrCase<"HAL_OPTED", 5>,
-      I32EnumAttrCase<"HAL_ADDRESSED", 6>
+      I32EnumAttrCase<"HAL_ADDRESSED", 6>,
+      I32EnumAttrCase<"CODEGEN", 7>
     ]> {
   let genSpecializedAttr = 0;
   let cppNamespace = "::tbc::utils";

@@ -21,6 +21,7 @@ using mlir::ModuleOp;
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createInitPass();
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createDeinitPass();
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createShapeInferPass();
+std::unique_ptr<mlir::OperationPass<ModuleOp>> createAssignCompilePhasePass();
 #define GEN_PASS_REGISTRATION
 #define GEN_PASS_CLASSES
 #include "dialects/operators/transforms/Passes.h.inc"
