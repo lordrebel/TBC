@@ -47,6 +47,7 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 
 ## TODO List
 - [ ] test fp8/fp16 onnx model import
+- [ ] add canonical pattern for reshape to set reshape mode
 - [ ] add svjson converter
 - [ ] add platform dependent pass for optmize imported model
 - [ ] kernel dialect design
