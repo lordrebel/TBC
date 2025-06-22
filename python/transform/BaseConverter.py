@@ -34,7 +34,7 @@ class BaseConverter(object):
                 raise KeyError("shape {} conflict {} vs {}".format(name, self.shapes[name], shape))
         self.value_infos[name] = ValueInfo(shape, dtype)
 
-    def getValueInfo(self, name):
+    def getValueInfo(self, name) -> ValueInfo:
         if name not in self.value_infos:
             raise KeyError("value info {} not found".format(name))
         if(self.input_shape_assgined and name not in self.input_names and name not in self.tensors):

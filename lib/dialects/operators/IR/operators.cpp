@@ -30,3 +30,4 @@ void OperatorDialect::initialize() {
 #include "dialects/operators/IR/operatorAttr.cpp.inc"
 #define GET_OP_CLASSES
 #include "dialects/operators/IR/Operators.cpp.inc"
+

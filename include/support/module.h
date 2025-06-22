@@ -103,6 +103,8 @@ bool isWeight(Value v);
 
 bool isAllWeight(Operation *op);
 bool isNone(Value v);
+Type DatatypeEnumToType(utils::DataType type, MLIRContext *ctx);
+utils::DataType TypeToDatatypeEnum(Type type);
 
 FuncOp getMainFuncOp(ModuleOp module);
 i32_array_t getI32Array(ArrayAttr arrayAttr);

@@ -16,8 +16,6 @@ include "mlir/Interfaces/SideEffectInterfaces.td"
 include "interfaces/ShapeInferInterface.td"
 include "interfaces/TypeInferInterface.td"
 
-include "support/Utils.td"
-
 // =============================================================================
 //
 // Defines Operator Dialect.
@@ -60,12 +58,9 @@ def DetectionOutputCodeTypeAttr: AnyStrAttrOf<["CORNER", "CENTER_SIZE", "CORNER_
 def NonZeroOrderAttr: AnyStrAttrOf<["ColMajor","RowMajor"]>;
 def AutoPadModeAttr:AnyStrAttrOf<["SAME_UPPER","SAME_LOWER","NOTSET","VALID"]>;
 
-def DataTypeAttr:EnumAttr<Operator_Dialect, DataType, "Dtype">{
-  let cppNamespace = "::tbc::ops";
-}
-def PaddingModeAttr : EnumAttr<Operator_Dialect, PaddingMode, "Pad_Mode">{
-let cppNamespace = "::tbc::ops";
-}
+def DataTypeAttr:AnyStrAttrOf<["F64","F32","F16","BF16","F8E4M3","F8E5M2","INT8","UINT8","INT16","UINT16","INT32","UINT32","INT64","UINT64","BOOL"]>;
+
+def PaddingModeAttr : AnyStrAttrOf<["constant","edge","no_pad","reflect","symmetric"]>;
 
 
 //===----------------------------------------------------------------------===//
@@ -1885,10 +1880,10 @@ def Operator_QuantizeLinearOp : Operator_Op<"QuantizeLinear"> {
 
   let arguments = (ins
     AnyTensor:$input,
-    F64ArrayAttr:$y_scale,
-    I32ArrayAttr:$y_zero_point,
+    AnyTensor:$y_scale,
+    AnyTensor:$y_zero_point,
     DefaultValuedAttr<I64Attr, "1">:$axis,
-    DefaultValuedAttr<DataTypeAttr, "utils::DataType::UINT8">:$dtype
+    DefaultValuedAttr<DataTypeAttr, "\"UINT8\"">:$dtype
   );
 
   let results = (outs AnyTensor:$output);
@@ -1990,10 +1985,10 @@ def Operator_DequantizeLinearOp : Operator_Op<"DequantizeLinear"> {
 
   let arguments = (ins
     AnyTensor:$input,
-    F64ArrayAttr:$x_scale,
-    I32ArrayAttr:$x_zero_point,
+    AnyTensor:$x_scale,
+    AnyTensor:$x_zero_point,
     DefaultValuedAttr<I64Attr, "1">:$axis,
-     DefaultValuedAttr<DataTypeAttr, "utils::DataType::F32">:$dtype
+     DefaultValuedAttr<DataTypeAttr, "\"F32\"">:$dtype
   );
 
   let results = (outs AnyTensor:$output);

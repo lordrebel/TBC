@@ -7,16 +7,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "support/module.h"
+#include "dialects/operators/IR/operator.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/BuiltinTypes.h"
+#include "mlir/IR/OpDefinition.h"
 #include "mlir/IR/Value.h"
 #include "support/mathutil.h"
 #include "support/tensorfile.h"
-#include<cstdint>
-#include "mlir/IR/OpDefinition.h"
-#include "dialects/operators/IR/operator.h"
 #include "support/utils.h"
-#include "support/module.h"
+#include <cstdint>
 using namespace mlir;
 using namespace mlir::func;
 using namespace tbc::utils;
@@ -283,8 +283,6 @@ void removeUnusedOp() {
   }
 }
 
-
-
 size_t getBytes(Value v) {
   if (isa<NoneType>(v.getType())) {
     return 0;
@@ -424,14 +422,13 @@ Type getElementType(Value v) {
 }
 
 void setElementType(Value v, Type type) {
-  if(isUnranked(v)){
+  if (isUnranked(v)) {
     v.setType(UnrankedTensorType::get(type));
-  }
-  else if (isa<RankedTensorType>(v.getType())) {
+  } else if (isa<RankedTensorType>(v.getType())) {
     auto shape = getShape(v);
     auto newType = RankedTensorType::get(shape, type);
     v.setType(newType);
-  } else if(isa<NoneType>(v.getType())) {
+  } else if (isa<NoneType>(v.getType())) {
     llvm::outs() << "v is NoneType skip setting element type\n";
 
   } else {
@@ -440,54 +437,61 @@ void setElementType(Value v, Type type) {
     llvm_unreachable("setElementType failed");
   }
 }
- bool allInputsAreNone(mlir::Operation *op) {
-    return std::all_of(op->getOperands().begin(), op->getOperands().end(), [](mlir::Value v){
-      return isa<mlir::NoneType>(v.getType());
-    });
-  }
-  bool allInputsAreSameElementType(mlir::Operation *op) {
-    auto nums=op->getNumOperands();
-    if(nums<1) return true;
-    Type firstType= nullptr;
-    for(size_t i=0;i<nums;i++){
-      auto type=op->getOperand(i).getType();
-      if(isa<mlir::NoneType>(type)) continue;
-      else{
-        firstType=module::getElementType(op->getOperand(i));
-        break;
-      }
-    }
-    if(firstType==nullptr) return true; // 全部是NoneType
-
-    for(size_t i=0;i<nums;i++){
-      auto type=op->getOperand(i).getType();
-      if(mlir::isa<mlir::NoneType>(type)) continue; // 跳过NoneType
-      if(module::getElementType(op->getOperand(i))!=firstType){
-        return false;
-      }
-    }
+bool allInputsAreNone(mlir::Operation *op) {
+  return std::all_of(
+      op->getOperands().begin(), op->getOperands().end(),
+      [](mlir::Value v) { return isa<mlir::NoneType>(v.getType()); });
+}
+bool allInputsAreSameElementType(mlir::Operation *op) {
+  auto nums = op->getNumOperands();
+  if (nums < 1)
     return true;
+  Type firstType = nullptr;
+  for (size_t i = 0; i < nums; i++) {
+    auto type = op->getOperand(i).getType();
+    if (isa<mlir::NoneType>(type))
+      continue;
+    else {
+      firstType = module::getElementType(op->getOperand(i));
+      break;
+    }
   }
-bool allInputsAreFloatElementType(mlir::Operation *op){
-  size_t nums=op->getNumOperands();
-  if(nums<1) return false;
-  for(size_t i=0;i<nums;i++){
-    auto type=op->getOperand(i).getType();
-    if(mlir::isa<mlir::NoneType>(type)) continue;
-    if(!mlir::isa<FloatType>(getElementType(op->getOperand(i)))){
+  if (firstType == nullptr)
+    return true; // 全部是NoneType
+
+  for (size_t i = 0; i < nums; i++) {
+    auto type = op->getOperand(i).getType();
+    if (mlir::isa<mlir::NoneType>(type))
+      continue; // 跳过NoneType
+    if (module::getElementType(op->getOperand(i)) != firstType) {
       return false;
     }
   }
   return true;
-
 }
-bool allInputsAreIntElementType(mlir::Operation *op){
-  size_t nums=op->getNumOperands();
-  if(nums<1) return false;
-  for(size_t i=0;i<nums;i++){
-    auto type=op->getOperand(i).getType();
-    if(mlir::isa<mlir::NoneType>(type)) continue;
-    if(!mlir::isa<mlir::IntegerType>(getElementType(op->getOperand(i)))){
+bool allInputsAreFloatElementType(mlir::Operation *op) {
+  size_t nums = op->getNumOperands();
+  if (nums < 1)
+    return false;
+  for (size_t i = 0; i < nums; i++) {
+    auto type = op->getOperand(i).getType();
+    if (mlir::isa<mlir::NoneType>(type))
+      continue;
+    if (!mlir::isa<FloatType>(getElementType(op->getOperand(i)))) {
+      return false;
+    }
+  }
+  return true;
+}
+bool allInputsAreIntElementType(mlir::Operation *op) {
+  size_t nums = op->getNumOperands();
+  if (nums < 1)
+    return false;
+  for (size_t i = 0; i < nums; i++) {
+    auto type = op->getOperand(i).getType();
+    if (mlir::isa<mlir::NoneType>(type))
+      continue;
+    if (!mlir::isa<mlir::IntegerType>(getElementType(op->getOperand(i)))) {
       return false;
     }
   }
@@ -551,7 +555,6 @@ void getNCHW(Value v, int64_t &n, int64_t &c, int64_t &h, int64_t &w,
   auto shape = cast<RankedTensorType>(v.getType()).getShape();
   getNCHW(shape, n, c, h, w, left_align);
 }
-
 
 FuncOp getFuncOp(ModuleOp mod, StringRef func_name) {
   for (auto func : mod.getOps<FuncOp>()) {
@@ -623,8 +626,7 @@ bool isShapeRelatedOp(Value v) {
   if (op == nullptr) {
     return false;
   }
-  if (isa<ops::ShapeOp>(
-          op)) {
+  if (isa<ops::ShapeOp>(op)) {
     return true;
   }
   return false;
@@ -672,6 +674,96 @@ void setShapeOrVerify(Value v, llvm::ArrayRef<int64_t> shape) {
   }
 }
 
+Type DatatypeEnumToType(utils::DataType type, MLIRContext *ctx) {
+  switch (type) {
+  case utils::DataType::F64:
+    return FloatType::getF64(ctx);
+  case utils::DataType::F32:
+    return FloatType::getF32(ctx);
+  case utils::DataType::F16:
+    return FloatType::getF16(ctx);
+  case utils::DataType::BF16:
+    return FloatType::getBF16(ctx);
+  case utils::DataType::F8E4M3:
+    return FloatType::getFloat8E4M3FN(ctx);
+  case utils::DataType::F8E5M2:
+    return FloatType::getFloat8E5M2(ctx);
+  case utils::DataType::TF32:
+    return FloatType::getTF32(ctx);
+  case utils::DataType::BOOL:
+    return IntegerType::get(ctx, 1);
+  case utils::DataType::INT4:
+    return IntegerType::get(ctx, 4, IntegerType::Signed);
+  case utils::DataType::UINT4:
+    return IntegerType::get(ctx, 4, IntegerType::Unsigned);
+  case utils::DataType::INT8:
+    return IntegerType::get(ctx, 8, IntegerType::Signed);
+  case utils::DataType::UINT8:
+    return IntegerType::get(ctx, 8, IntegerType::Unsigned);
+  case utils::DataType::INT16:
+    return IntegerType::get(ctx, 16, IntegerType::Signed);
+  case utils::DataType::UINT16:
+    return IntegerType::get(ctx, 16, IntegerType::Unsigned);
+  case utils::DataType::INT32:
+    return IntegerType::get(ctx, 32, IntegerType::Signed);
+  case utils::DataType::UINT32:
+    return IntegerType::get(ctx, 32, IntegerType::Unsigned);
+  case utils::DataType::INT64:
+    return IntegerType::get(ctx, 64, IntegerType::Signed);
+  case utils::DataType::UINT64:
+    return IntegerType::get(ctx, 64, IntegerType::Unsigned);
+  default:
+    llvm_unreachable("Unsupported Data Type");
+  }
+}
+
+utils::DataType TypeToDatatypeEnum(Type type) {
+  if (type.isF64()) {
+    return utils::DataType::F64;
+  } else if (type.isF32()) {
+    return utils::DataType::F32;
+  } else if (type.isF16()) {
+    return utils::DataType::F16;
+  } else if (type.isBF16()) {
+    return utils::DataType::BF16;
+  } else if (type.isFloat8E4M3FN()) {
+    return utils::DataType::F8E4M3;
+  } else if (type.isFloat8E5M2()) {
+    return utils::DataType::F8E5M2;
+  } else if (type.isTF32()) {
+    return utils::DataType::TF32;
+  } else if (auto intType = dyn_cast<IntegerType>(type)) {
+    unsigned width = intType.getWidth();
+
+    // 检查是否明确指定了符号性
+    bool isExplicitlyUnsigned = intType.isUnsigned();
+
+    // 对于signless类型，我们默认将其视为有符号类型
+    // 这与大多数编译器的默认行为一致
+
+    if (width == 1) {
+      return utils::DataType::BOOL;
+    } else if (width == 4) {
+      return isExplicitlyUnsigned ? utils::DataType::UINT4
+                                  : utils::DataType::INT4;
+    } else if (width == 8) {
+      return isExplicitlyUnsigned ? utils::DataType::UINT8
+                                  : utils::DataType::INT8;
+    } else if (width == 16) {
+      return isExplicitlyUnsigned ? utils::DataType::UINT16
+                                  : utils::DataType::INT16;
+    } else if (width == 32) {
+      return isExplicitlyUnsigned ? utils::DataType::UINT32
+                                  : utils::DataType::INT32;
+    } else if (width == 64) {
+      return isExplicitlyUnsigned ? utils::DataType::UINT64
+                                  : utils::DataType::INT64;
+    }
+  }
+
+  llvm_unreachable("Unsupported Type to DataType conversion");
+}
+
 Target getTarget() { return target; }
 
 Mode getMode() {
@@ -712,8 +804,6 @@ void setMode(Mode mode) {
   auto s = stringifyMode(mode);
   m->setAttr(Attr::MODE, StringAttr::get(ctx, s));
 }
-
-
 
 std::shared_ptr<std::vector<ModuleOp>> getAllModules() {
   auto modules = std::make_shared<std::vector<ModuleOp>>();
@@ -759,12 +849,8 @@ void setCompilePhase(CompilePhase phase) {
 void setInputs(ArrayRef<StringRef> inputs) {
   m->setAttr(Attr::INPUTS, Builder(ctx).getStrArrayAttr(inputs));
 }
-bool isNPU_V1(){
-  return target==Target::NPU_V1;
-}
-bool isNPU_V2(){
-  return target==Target::NPU_V1;
-}
+bool isNPU_V1() { return target == Target::NPU_V1; }
+bool isNPU_V2() { return target == Target::NPU_V1; }
 std::shared_ptr<std::vector<StringRef>> getInputs() {
   auto inputs = m->getAttrOfType<ArrayAttr>(Attr::INPUTS);
   auto data = std::make_shared<std::vector<StringRef>>();
@@ -790,7 +876,6 @@ std::shared_ptr<std::vector<StringRef>> getOutputs() {
 }
 
 bool isCompilePhase(CompilePhase phase) { return phase == getCompilePhase(); }
-
 
 ModuleOp getModuleOp() { return m; }
 
@@ -981,8 +1066,6 @@ void getInputsOutputs(func::CallOp call, std::vector<Value> &inputs,
   });
 }
 
-
-
 //-----------------------------------------------------------------
 // Helper Functions for weight
 //-----------------------------------------------------------------
@@ -993,8 +1076,8 @@ static std::string genWeightFileName(bool &same_name) {
   auto target = stringifyTarget(target_);
   auto old_name = m->getAttrOfType<StringAttr>(Attr::WEIGHT_FILE).getValue();
   std::string file_name = name.lower() + std::string("_") +
-                          stringifyCompilePhase(phase).lower() + std::string("_") +
-                          target.lower();
+                          stringifyCompilePhase(phase).lower() +
+                          std::string("_") + target.lower();
   if (!isTarget(Target::ALL)) {
     auto mode = getMode();
     std::string sym = "";
@@ -1019,7 +1102,9 @@ void saveWeight() {
   for (auto s : *modules) {
     for (auto func : s.getOps<FuncOp>()) {
       func.walk([&](Operation *op) {
-        if (dyn_cast<NameLoc>(op->getLoc()) && !isa<func::ReturnOp, func::CallOp, func::FuncOp, ops::InputOp>(op)) {
+        if (dyn_cast<NameLoc>(op->getLoc()) &&
+            !isa<func::ReturnOp, func::CallOp, func::FuncOp, ops::InputOp>(
+                op)) {
           auto name = module::getName(op);
           // if op have more than two regions, it can have the same op Name
           if (all_names.find(name) != all_names.end()) {
@@ -1115,7 +1200,6 @@ std::vector<int64_t> getShapeTensorValue(const Value &v) {
 }
 
 bool isShape(const Value &v) { return ShapeHelper::getInstance().isShape(v); }
-
 
 } // namespace module
 } // namespace tbc

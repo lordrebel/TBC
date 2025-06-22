@@ -16,5 +16,7 @@ void ops::DequantizeLinearOp::shape_inference() {
 }
 
 void ops::DequantizeLinearOp::type_inference() {
-  llvm_unreachable("DequantizeLinearOp type inference is not implemented yet.");
+  DataType dtype= tbc::utils::symbolizeDataType(getDtypeAttr().getValue()).value();
+  Type type =module::DatatypeEnumToType(dtype,getContext());
+  module::setElementType(getOutput(), type);
 }

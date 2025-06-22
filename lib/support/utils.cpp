@@ -1,2 +1,2 @@
-#include"support/utils.h"
-#include"support/UtilsEnum.cpp.inc"
+#include "support/utils.h"
+#include "support/UtilsEnum.cpp.inc"

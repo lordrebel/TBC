@@ -7,11 +7,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
+#include "mlir/IR/Types.h"
 #include "support/module.h"
 
 void ops::QuantizeLinearOp::shape_inference() {
   common_shape_inference(getOperation());
 }
 void ops::QuantizeLinearOp::type_inference() {
- llvm_unreachable("QuantizeLinearOp type inference is not implemented yet.");
+  DataType dtype= tbc::utils::symbolizeDataType(getDtypeAttr().getValue()).value();
+  Type type =module::DatatypeEnumToType(dtype,getContext());
+  module::setElementType(getOutput(), type);
 }

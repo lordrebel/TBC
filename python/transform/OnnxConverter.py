@@ -654,12 +654,15 @@ class OnnxConverter(BaseConverter):
 
     def convert_cast_op(self, onnx_node):
         assert (onnx_node.op_type == "Cast")
-        if self.isWeight(onnx_node.inputs[0]):
-            data = self.getWeight(onnx_node.inputs[0])
-            self.addWeight(onnx_node.name, data, self.getDtype(onnx_node.inputs[0]))
-        else:
-            op = self.getOp(onnx_node.inputs[0])
-            self.addOperand(onnx_node.name, op)
+        op = self.getOp(onnx_node.inputs[0])
+        to_dtype=axis = onnx_node.attrs['to']
+
+        new_op= operators.CastOp(self.valueInfoToTensorType(onnx_node.outputs[0]),
+                        op,
+                        dtype=self.dtype_map[to_dtype],
+                        loc=self.get_loc("{}_{}".format(onnx_node.name, onnx_node.op_type)),
+                        ip=self.mlir.insert_point).output
+        self.addOperand(onnx_node.name, new_op)
 
     def convert_ceil_op(self, onnx_node):
         assert (onnx_node.op_type == "Ceil")
@@ -2147,13 +2150,14 @@ class OnnxConverter(BaseConverter):
         assert (onnx_node.op_type == "QuantizeLinear")
         assert (len(onnx_node.inputs) == 3)
         operand = self.getOp(onnx_node.inputs[0])
-        y_scale = self.getWeight(onnx_node.inputs[1]).tolist()
-        y_zero_point = self.getWeight(onnx_node.inputs[2]).tolist()
+        y_scale = self.getWeightOp(onnx_node.inputs[1])
+        y_zero_point = self.getWeightOp(onnx_node.inputs[2])
         if hasattr(onnx_node, 'attrs'):
             axis = onnx_node.attrs.get('axis', None)
 
         new_op = operators.QuantizeLinearOp(self.valueInfoToTensorType(onnx_node.outputs[0]),
                                       operand,
+                                      dtype=self.getValueInfo(onnx_node.inputs[2]).dtype, #change to zero point type
                                       y_scale=y_scale,
                                       y_zero_point=y_zero_point,
                                       axis=axis,
@@ -2169,8 +2173,8 @@ class OnnxConverter(BaseConverter):
             operand = self.getOp(onnx_node.inputs[0])
         except:
             operand = self.getWeightOp(onnx_node.inputs[0])
-        x_scale = self.getWeight(onnx_node.inputs[1])
-        x_zero_point = self.getWeight(onnx_node.inputs[2])
+        x_scale = self.getWeightOp(onnx_node.inputs[1])
+        x_zero_point = self.getWeightOp(onnx_node.inputs[2])
         if hasattr(onnx_node, 'attrs'):
             axis = onnx_node.attrs.get('axis', None)
         new_op = operators.DequantizeLinearOp(self.valueInfoToTensorType(onnx_node.outputs[0]),
@@ -2178,6 +2182,7 @@ class OnnxConverter(BaseConverter):
                                         x_scale=x_scale,
                                         x_zero_point=x_zero_point,
                                         axis=axis,
+                                        dtype=self.getValueInfo(onnx_node.inputs[1]).dtype, #change to scale type
                                         loc=self.get_loc("{}_{}".format(
                                             onnx_node.name, onnx_node.op_type)),
                                         ip=self.mlir.insert_point).output

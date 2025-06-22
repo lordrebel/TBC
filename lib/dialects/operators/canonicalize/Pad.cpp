@@ -24,7 +24,8 @@ struct TopFusePad : public OpRewritePattern<PadOp> {
     int pad_dim = tensor_dim - 2;
 
     // only const pad
-    auto pad_mode = op.getMode();
+    auto pad_mode_str = op.getMode();
+    auto pad_mode = tbc::utils::symbolizePaddingMode(pad_mode_str).value();
     if ( pad_mode != ::tbc::utils::PaddingMode::constant)
       return failure();
 
