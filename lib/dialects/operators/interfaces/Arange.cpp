@@ -43,3 +43,4 @@ void ops::ArangeOp::shape_inference() {
   auto new_op = ops::WeightOp::create(op, "arange", data, weight_type);
   getOutput().replaceAllUsesWith(new_op);
 }
+void ops::ArangeOp::type_inference() { module::setElementType(getOutput(), mlir::IntegerType::get(this->getContext(), 64)); }

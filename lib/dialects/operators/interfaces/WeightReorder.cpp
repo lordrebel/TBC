@@ -7,9 +7,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
 void ops::WeightReorderOp::shape_inference() {
 
+}
+void ops::WeightReorderOp::type_inference() {
+  common_type_inference(getOperation());
 }

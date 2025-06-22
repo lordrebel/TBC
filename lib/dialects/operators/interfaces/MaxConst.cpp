@@ -13,3 +13,8 @@
 void ops::MaxConstOp::shape_inference() {
   common_shape_inference(getOperation());
 }
+void ops::MaxConstOp::type_inference() {
+  auto output = getOutput();
+  auto input = getInput();
+  module::setElementType(output, module::getElementType(input));
+}

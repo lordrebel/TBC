@@ -142,3 +142,6 @@ void ops::MaxPoolOp::shape_inference() {
   removeCeilModeAttr();
   module::setShapeOrVerify(getOutput(), out_shape);
 }
+void ops::MaxPoolOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
@@ -70,4 +71,8 @@ void ops::GRUOp::shape_inference() {
   if (module::isNone(getYH()) == false) {
     module::setShapeOrVerify(getYH(), shape1);
   }
+}
+
+void ops::GRUOp::type_inference() {
+  common_type_inference(getOperation());
 }

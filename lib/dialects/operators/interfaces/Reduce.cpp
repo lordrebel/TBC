@@ -37,3 +37,4 @@ void ops::ReduceOp::shape_inference() {
     out_shape.push_back(1);
   module::setShapeOrVerify(getOutput(), out_shape);
 }
+void ops::ReduceOp::type_inference() { common_type_inference(getOperation()); }

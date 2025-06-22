@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 #include "llvm/Support/ErrorHandling.h"
 
@@ -60,4 +61,8 @@ void ops::WhereOp::shape_inference() {
   if (input_shapes_v.size() == 3) {
     llvm_unreachable("not support for input_shapes_v ==3");
   }
+  llvm_unreachable("not finished");
+}
+void ops::WhereOp::type_inference(){
+  llvm_unreachable("not finished");
 }

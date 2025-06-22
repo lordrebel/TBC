@@ -73,3 +73,28 @@ LogicalResult ops::IfOp::verify() {
   }
   return success();
 }
+void ops::IfOp::type_inference() {
+ auto yield_op = getRegion(0).back().getTerminator();
+  std::vector<Type> types;
+  // get shape
+  for (auto opd : yield_op->getOperands()) {
+    types.push_back(module::getElementType(opd));
+  }
+  // check if is vaild
+  for (uint32_t i = 1; i < getNumRegions(); i++) {
+    yield_op = getRegion(i).back().getTerminator();
+    auto nof_inputs = yield_op->getNumOperands();
+    assert(nof_inputs == types.size() && "Regions have different num of output, fix me.");
+    for (uint32_t j = 0; j < nof_inputs; j++) {
+      auto _type = module::getElementType(yield_op->getOperand(j));
+      assert((types[j] == _type) && "Regions have different output type, fix me.");
+    }
+  }
+  // set shape
+  for (auto res_type: llvm::zip(getResults(), types)) {
+    auto res = std::get<0>(res_type);
+    auto type = std::get<1>(res_type);
+    module::setElementType(res, type);
+  }
+  return;
+}

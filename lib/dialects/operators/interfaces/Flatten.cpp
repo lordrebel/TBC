@@ -57,3 +57,7 @@ void ops::FlattenOp::shape_inference() {
   out.replaceAllUsesWith(new_op.getOutput());
   new_op.shape_inference();
 }
+
+void ops::FlattenOp::type_inference() {
+  common_type_inference(getOperation());
+}

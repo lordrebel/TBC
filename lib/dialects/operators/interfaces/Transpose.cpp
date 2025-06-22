@@ -48,3 +48,7 @@ void ops::TransposeOp::shape_inference() {
                                           ValueRange{getInput()}, attrs);
   op->replaceAllUsesWith(new_op);
 }
+
+void ops::TransposeOp::type_inference() {
+  common_type_inference(getOperation());
+}

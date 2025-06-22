@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 void ops::Depth2SpaceOp::shape_inference() {
@@ -40,4 +41,8 @@ void ops::Depth2SpaceOp::shape_inference() {
     out_shape[num_dims - 1] = oc;
   }
   module::setShapeOrVerify(getOutput(), out_shape);
+}
+
+void ops::Depth2SpaceOp::type_inference() {
+common_type_inference(getOperation());
 }

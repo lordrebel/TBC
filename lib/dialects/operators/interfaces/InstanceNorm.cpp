@@ -24,3 +24,6 @@ void ops::InstanceNormOp::shape_inference() {
   }
   common_shape_inference(getOperation());
 }
+void ops::InstanceNormOp::type_inference() {
+ module::setElementType(getOutput(), module::getElementType(getInput()));
+}

@@ -12,3 +12,6 @@
 
 
 void ops::FloorOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::FloorOp::type_inference() {
+  common_type_inference(getOperation());
+}

@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 #include"support/mathutil.h"
 conv_attr_t ops::ConvOp::parseParam() {
@@ -128,4 +129,9 @@ void ops::ConvOp::shape_inference() {
     out_shape.push_back(out_dim);
   }
   module::setShapeOrVerify(getOutput(), out_shape);
+}
+void ops::ConvOp::type_inference() {
+  auto op = getOperation();
+  broadcast_type_inference(op);
+
 }

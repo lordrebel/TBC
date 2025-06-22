@@ -55,6 +55,7 @@ class OnnxTransformer(ModelTransformer):
     def __init__(self,
                  model_name,
                  model_path,
+                 mode="F32",
                  input_shapes: list = [],
                  output_names: list = [],
                  without_simplfy=False,
@@ -63,6 +64,7 @@ class OnnxTransformer(ModelTransformer):
         from transform.OnnxConverter import OnnxConverter
         self.converter = OnnxConverter(self.model_name,
                                        self.model_path,
+                                       mode,
                                        input_shapes,
                                        output_names,
                                        self.without_simplfy,
@@ -80,6 +82,7 @@ class TorchTransformer(ModelTransformer):
     def __init__(self,
                  model_name,
                  model_path,
+                mode="F32",
                  input_shapes: list = [],
                  input_types: list = [],
                  output_names: list = [],
@@ -96,6 +99,7 @@ def get_model_transform(args):
     if args.platform=="onnx":
         tool = OnnxTransformer(args.model_name,
                                args.model_path,
+                               args.mode,
                                args.input_shapes,
                                args.output_names,
                                args.without_simplfy,
@@ -117,6 +121,8 @@ if __name__ == '__main__':
     parser.add_argument("--model_path", required=True, help="model definition file.")
     parser.add_argument("--platform", type=str, required=True,choices=["onnx", "torch"],
                         help="model platform, like:onnx,torch")
+    parser.add_argument("--mode",type=str,default="F32",choices=["INT8","UINT8","INT4","BF16","F16","F32","W8F16","W8BF16","W4F16","W4BF16","F8E4M3","F8E5M2","W4F8E4M3","W4F8E5M2",],
+                        help="the precision of model, like:INT8,UINT8,INT4,BF16,F16,F32,W8F16,W8BF16,W4 default is F32")
     parser.add_argument("--input_shapes", type=str2shape, default=list(),
                         help="list of input shapes, like:[[1,3,224,224],[10],[16]]")
     parser.add_argument("--input_types", type=str2list, default=list(),

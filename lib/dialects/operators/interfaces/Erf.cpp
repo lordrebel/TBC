@@ -10,3 +10,6 @@
 #include "support/module.h"
 
 void ops::ErfOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::ErfOp::type_inference() {
+  common_type_inference(getOperation());
+}

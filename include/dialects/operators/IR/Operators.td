@@ -14,6 +14,7 @@ include "mlir/IR/EnumAttr.td"
 include "mlir/IR/OpBase.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 include "interfaces/ShapeInferInterface.td"
+include "interfaces/TypeInferInterface.td"
 
 include "support/Utils.td"
 
@@ -59,6 +60,9 @@ def DetectionOutputCodeTypeAttr: AnyStrAttrOf<["CORNER", "CENTER_SIZE", "CORNER_
 def NonZeroOrderAttr: AnyStrAttrOf<["ColMajor","RowMajor"]>;
 def AutoPadModeAttr:AnyStrAttrOf<["SAME_UPPER","SAME_LOWER","NOTSET","VALID"]>;
 
+def DataTypeAttr:EnumAttr<Operator_Dialect, DataType, "Dtype">{
+  let cppNamespace = "::tbc::ops";
+}
 def PaddingModeAttr : EnumAttr<Operator_Dialect, PaddingMode, "Pad_Mode">{
 let cppNamespace = "::tbc::ops";
 }
@@ -175,7 +179,8 @@ def Operator_UnTupleOp: Operator_BaseOp<"UnTuple"> {
 class Operator_Op<string mnemonic, list<Trait> traits = []> :
     Operator_BaseOp<mnemonic, !listconcat(traits,
        [
-        DeclareOpInterfaceMethods<ShapeInferInterface>])>;
+        DeclareOpInterfaceMethods<ShapeInferInterface>,
+        DeclareOpInterfaceMethods<TypeInferInterface>])>;
 
 def Operator_BatchNormOp: Operator_Op<"BatchNorm"> {
   let summary = "BatchNormalization operation";
@@ -208,10 +213,12 @@ def Operator_BatchNormOp: Operator_Op<"BatchNorm"> {
 def Operator_CastOp:Operator_Op<"Cast"> {
   let summary = "Cast operation";
   let description = [{
-    quant::UniformQuantizedType cast to float type; or float type cast to quant::UniformQuantizedType
+    Casts the input tensor to the specified dtype.
+    The input tensor must be a ranked tensor.
   }];
   let arguments = (ins
-    AnyTensor:$input
+    AnyTensor:$input,
+    DataTypeAttr:$dtype
   );
   let results = (outs AnyTensor:$output);
 }
@@ -799,7 +806,6 @@ def Operator_ReshapeOp:Operator_Op<"Reshape"> {
   }];
   let arguments = (ins
     AnyTensor:$input,
-    DefaultValuedAttr<I64Attr, "2">:$mode,
     Optional<AnyTensor>:$shapeT,
     OptionalAttr<I64ArrayAttr>:$shape
 
@@ -940,7 +946,8 @@ def Operator_ConstantFillOp: Operator_Op<"ConstantFill"> {
   }];
   let arguments = (ins
     AnyTensor:$input,
-    F64Attr:$value
+    F64Attr:$value,
+    DataTypeAttr:$dtype
   );
 
   let results = (outs
@@ -1726,8 +1733,9 @@ def Operator_Pow2Op : Operator_Op<"Pow2"> {
     output = n ^ input
   }];
   let arguments = (ins
-    F64Attr: $const_val,
-    AnyTensor:$input
+    AnyTensor:$input,
+    F64Attr: $const_val
+
   );
   let results = (outs AnyTensor:$output);
   //let hasCanonicalizer = 1;
@@ -1879,7 +1887,8 @@ def Operator_QuantizeLinearOp : Operator_Op<"QuantizeLinear"> {
     AnyTensor:$input,
     F64ArrayAttr:$y_scale,
     I32ArrayAttr:$y_zero_point,
-    DefaultValuedAttr<I64Attr, "1">:$axis
+    DefaultValuedAttr<I64Attr, "1">:$axis,
+    DefaultValuedAttr<DataTypeAttr, "utils::DataType::UINT8">:$dtype
   );
 
   let results = (outs AnyTensor:$output);
@@ -1983,7 +1992,8 @@ def Operator_DequantizeLinearOp : Operator_Op<"DequantizeLinear"> {
     AnyTensor:$input,
     F64ArrayAttr:$x_scale,
     I32ArrayAttr:$x_zero_point,
-    DefaultValuedAttr<I64Attr, "1">:$axis
+    DefaultValuedAttr<I64Attr, "1">:$axis,
+     DefaultValuedAttr<DataTypeAttr, "utils::DataType::F32">:$dtype
   );
 
   let results = (outs AnyTensor:$output);

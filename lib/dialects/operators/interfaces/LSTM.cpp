@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 
 lstm_attr_t ops::LSTMOp::parseParam() {
@@ -76,4 +77,12 @@ void ops::LSTMOp::shape_inference() {
   if (module::isNone(getYC()) == false) {
     module::setShapeOrVerify(getYC(), shape2);
   }
+}
+void ops::LSTMOp::type_inference(){
+  if(!module::isNone(getY()))
+    module::setElementType(getY(), module::getElementType(getInput()));
+  if(!module::isNone(getYH()))
+    module::setElementType(getYH(), module::getElementType(getInput()));
+  if(!module::isNone(getYC()))
+    module::setElementType(getYC(), module::getElementType(getInput()));
 }

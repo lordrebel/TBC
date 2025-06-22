@@ -25,3 +25,7 @@ void ops::GroupNormOp::shape_inference() {
   }
   common_shape_inference(getOperation());
 }
+
+void ops::GroupNormOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

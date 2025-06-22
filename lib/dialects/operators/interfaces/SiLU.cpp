@@ -7,8 +7,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
 
 void ops::SiLUOp::shape_inference() { common_shape_inference(getOperation()); }
+
+void ops::SiLUOp::type_inference() {
+  common_type_inference(getOperation());
+}

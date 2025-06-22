@@ -10,3 +10,7 @@
 #include "support/module.h"
 
 void ops::LRNOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::LRNOp::type_inference() {
+  common_type_inference(getOperation());
+}
+

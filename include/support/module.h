@@ -84,8 +84,12 @@ size_t getBytes(Value v);
 int64_t getNumElements(Value v);
 Type getStorageType(Value v); // storage type
 Type getStorageType(Type type);
-Type getWeightStorageType(ops::WeightOp *op);
 Type getElementType(Value v);
+void setElementType(Value v,Type type);
+bool allInputsAreSameElementType(mlir::Operation *op);
+bool allInputsAreFloatElementType(mlir::Operation *op);
+bool allInputsAreIntElementType(mlir::Operation *op);
+bool allInputsAreNone(mlir::Operation *op);
 RankedTensorType getTypeLike(Value v, llvm::ArrayRef<int64_t> shape);
 
 void setShape(Value v, llvm::ArrayRef<int64_t> shape);

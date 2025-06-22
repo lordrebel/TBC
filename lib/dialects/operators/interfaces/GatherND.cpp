@@ -32,3 +32,7 @@ void ops::GatherNDOp::shape_inference() {
   }
   module::setShapeOrVerify(getOutput(), output_shape);
 }
+
+void ops::GatherNDOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

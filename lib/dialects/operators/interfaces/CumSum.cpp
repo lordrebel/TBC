@@ -13,3 +13,7 @@
 void ops::CumSumOp::shape_inference() {
 common_shape_inference(getOperation());
 }
+
+void ops::CumSumOp::type_inference() {
+common_type_inference(getOperation());
+}

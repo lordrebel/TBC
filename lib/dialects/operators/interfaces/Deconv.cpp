@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 deconv_attr_t ops::DeconvOp::parseParam() {
@@ -128,4 +129,8 @@ void ops::DeconvOp::shape_inference() {
     out_shape.push_back(out_dim);
   }
   module::setShapeOrVerify(getOutput(), out_shape);
+}
+
+void ops::DeconvOp::type_inference() {
+broadcast_type_inference(getOperation());
 }

@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 // clang-format off
@@ -120,4 +121,8 @@ void ops::MatMulOp::shape_inference() {
     out_shape[1] = n;
   }
   module::setShapeOrVerify(getOutput(), out_shape);
+}
+
+void ops::MatMulOp::type_inference() {
+  broadcast_type_inference(getOperation());
 }

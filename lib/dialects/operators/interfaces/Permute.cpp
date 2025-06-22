@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 #include "support/mathutil.h"
 permute_attr_t ops::PermuteOp::parseParam() {
@@ -52,4 +53,7 @@ void ops::PermuteOp::shape_inference() {
     out_shape.push_back(in_shape[(*in_order)[i]]);
   }
   module::setShapeOrVerify(getOutput(), out_shape);
+}
+void ops::PermuteOp::type_inference() {
+  common_type_inference(getOperation());
 }

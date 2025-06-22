@@ -24,3 +24,8 @@ void ops::NonZeroOp::shape_inference() {
   }
   module::setShapeOrVerify(getOutput(), output_shape);
 }
+void ops::NonZeroOp::type_inference() {
+  auto input = getInput();
+  auto output = getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

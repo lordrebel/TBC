@@ -49,3 +49,4 @@ void ops::AdaptiveAvgPoolOp::shape_inference() {
   new_op.shape_inference();
 
 }
+void ops::AdaptiveAvgPoolOp::type_inference() { common_type_inference(getOperation()); }

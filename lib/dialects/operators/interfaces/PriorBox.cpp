@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
@@ -21,4 +22,7 @@ void ops::PriorBoxOp::shape_inference() {
   out_shape.push_back(2);
   out_shape.push_back(dim);
   module::setShapeOrVerify(getOutput(), out_shape);
+}
+void ops::PriorBoxOp::type_inference() {
+  broadcast_type_inference(getOperation());
 }

@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 void ops::ReshapeOp::shape_inference() {
@@ -79,4 +80,7 @@ void ops::ReshapeOp::shape_inference() {
   }
 
   removeShapeAttr();
+}
+void ops::ReshapeOp::type_inference() {
+  common_type_inference(getOperation());
 }

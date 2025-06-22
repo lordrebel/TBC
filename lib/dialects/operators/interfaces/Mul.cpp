@@ -16,3 +16,6 @@ void ops::MulOp::shape_inference() {
     broadcast_tensor_reshape(getOutput(), value);
   }
 }
+void ops::MulOp::type_inference() {
+  broadcast_type_inference(getOperation());
+}

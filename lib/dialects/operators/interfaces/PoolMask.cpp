@@ -11,3 +11,6 @@
 
 
 void ops::PoolMaskOp::shape_inference() {}
+void ops::PoolMaskOp::type_inference() {
+  common_type_inference(getOperation());
+}

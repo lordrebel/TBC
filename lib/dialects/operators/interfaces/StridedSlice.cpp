@@ -11,3 +11,9 @@
 
 
 void ops::StridedSliceOp::shape_inference() {}
+
+void ops::StridedSliceOp::type_inference() {
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

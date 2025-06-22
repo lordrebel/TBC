@@ -16,3 +16,6 @@ void ops::MinOp::shape_inference() {
     broadcast_tensor_reshape(getOutput(), value);
   }
 }
+void ops::MinOp::type_inference() {
+  broadcast_type_inference(getOperation());
+}

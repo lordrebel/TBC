@@ -10,3 +10,4 @@
 #include "support/module.h"
 
 void ops::ReluOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::ReluOp::type_inference() { common_type_inference(getOperation()); }

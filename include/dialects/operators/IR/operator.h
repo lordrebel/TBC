@@ -10,6 +10,7 @@
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 #include "interfaces/shapeInfer_interface.h"
+#include "interfaces/typeInfer_interface.h"
 
 #include "traits/traits.h"
 #include"support/utils.h"

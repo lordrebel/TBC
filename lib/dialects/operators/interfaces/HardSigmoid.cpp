@@ -13,3 +13,7 @@
 void ops::HardSigmoidOp::shape_inference() {
   common_shape_inference(getOperation());
 }
+
+void ops::HardSigmoidOp::type_inference() {
+  common_type_inference(getOperation());
+}

@@ -7,8 +7,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 #include "mlir/IR/TypeUtilities.h"
+#include "llvm/Support/ErrorHandling.h"
 
 
 Operation::result_range ops::LoopOp::v_final() {
@@ -133,4 +135,8 @@ void ops::LoopOp::shape_inference() {
   }
 
   return;
+}
+
+void ops::LoopOp::type_inference(){
+  llvm_unreachable("loopOp type_inference not implemented yet");
 }

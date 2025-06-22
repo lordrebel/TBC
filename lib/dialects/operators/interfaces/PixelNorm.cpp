@@ -25,3 +25,8 @@ void ops::PixelNormOp::shape_inference() {
   }
   common_shape_inference(getOperation());
 }
+void ops::PixelNormOp::type_inference() {
+  auto input = getInput();
+  auto output = getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

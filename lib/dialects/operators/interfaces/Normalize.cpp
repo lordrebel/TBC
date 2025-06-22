@@ -12,3 +12,6 @@
 void ops::NormalizeOp::shape_inference() {
   common_shape_inference(getOperation());
 }
+void ops::NormalizeOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

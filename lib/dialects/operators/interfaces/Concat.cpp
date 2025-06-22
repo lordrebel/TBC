@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 #include "llvm/Support/ErrorHandling.h"
 
@@ -28,4 +29,7 @@ void ops::ConcatOp::shape_inference() {
   if (llvm::find_if(getOperands(), module::isShape) != getOperands().end()) {
     llvm_unreachable("not support shape inference for concat op yet. ");
   }
+}
+void ops::ConcatOp::type_inference() {
+  broadcast_type_inference(getOperation());
 }

@@ -39,3 +39,4 @@ void ops::SqueezeOp::shape_inference() {
   }
   module::setShapeOrVerify(getOutput(), out_shape);
 }
+void ops::SqueezeOp::type_inference(){common_type_inference(getOperation());}

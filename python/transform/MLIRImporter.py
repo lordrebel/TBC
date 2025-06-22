@@ -25,6 +25,22 @@ class Platform:
     TORCH = "TORCH"
     SV_JSON = "SV_JSON"
 
+class Mode:
+  INT8 = "INT8",
+  UINT8 = "UINT8",
+  INT4 = "INT4",
+  BF16 = "BF16",
+  F16 = "F16",
+  F32 = "F32",
+  W8F16 = "W8F16",
+  W8BF16 = "W8BF16",
+  W4F16 = "W4F16",
+  W4BF16 = "W4BF16",
+  F8E4M3 = "F8E4M3",
+  F8E5M2 = "F8E5M2",
+  W4F8E4M3 = "W4F8E4M3",
+  W4F8E5M2 = "W4F8E5M2",
+
 
 def get_weight_file(model_name: str, compile_phase: str, target: str):
     name = "{}_{}_{}_origin_weight.npz".format(model_name, compile_phase, target)
@@ -38,6 +54,7 @@ class MLIRImporter(object):
                  output_shapes: list,
                  model_name: str,
                  platform: str = Platform.ONNX,
+                 mode: str =Mode.F32,
                  input_types: list = [],
                  output_types: list = [],
                  compilephase: str = CompilePhase.IMPORTED,
@@ -51,6 +68,7 @@ class MLIRImporter(object):
         self.compilephase = compilephase
         self.target = "ALL"
         self.platform = platform
+        self.mode=mode
         self.weight_file = get_weight_file(self.model_name, self.compilephase, self.target)
         self.ctx = Context()
         self.ctx.allow_unregistered_dialects = True
@@ -79,8 +97,8 @@ class MLIRImporter(object):
             "F32": F32Type.get(),
             "F16": F16Type.get(),
             "BF16": BF16Type.get(),
-            "Float8E4M3":Float8E4M3FNType.get(),
-            "Float8E5M2":Float8E5M2Type.get(),
+            "FLOAT8E4M3":Float8E4M3FNType.get(),
+            "FLOAT8E5M2":Float8E5M2Type.get(),
             "DICT": DictAttr.get(),
         }
         if do_declare:
@@ -298,7 +316,7 @@ class MLIRImporter(object):
             result_types = output_txt[1:-1]
             result_var_name = ",".join([f"%1#{var_id}" for var_id in range(self.num_output)])
         main_func = """
-            module @\"{name}\" attributes {{module.weight_file= \"{weight_file}\", module.platform=\"{platform}\", module.compile_phase=\"{compile_phase}\", module.target=\"{target}\"}} {{
+            module @\"{name}\" attributes {{module.weight_file= \"{weight_file}\", module.platform=\"{platform}\", module.compile_phase=\"{compile_phase}\", module.target=\"{target}\", module.mode=\"{mode}\"}} {{
                 func.func @main({args}) -> {output} {{
                     %0 = \"operators.None\"() : () -> none loc(unknown)
                     %1:{last_output_num} = \"Placeholder.Op\"() : () -> {output}
@@ -314,7 +332,8 @@ class MLIRImporter(object):
                    output=output_txt,
                    last_output_num=self.num_output,
                    result_var=result_var_name,
-                   result_types=result_types)
+                   result_types=result_types,
+                   mode=self.mode)
         self.mlir_module = Module.parse(main_func, self.ctx)
         self.func = self.mlir_module.body.operations[0]
         self.entry_block = self.func.regions[0].blocks[0]

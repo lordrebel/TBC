@@ -28,3 +28,6 @@ void ops::AddOp::shape_inference() {
     llvm_unreachable("Not Implemented for shape op inerence");
   }
 }
+void ops::AddOp::type_inference() {
+  broadcast_type_inference(getOperation());
+}

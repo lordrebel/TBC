@@ -8,6 +8,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "support/module.h"
+#include "llvm/Support/ErrorHandling.h"
 
 // ListOp is special, will convert to WeightOp
 void ops::ListOp::shape_inference() {
@@ -20,4 +21,8 @@ void ops::ListOp::shape_inference() {
   }
   std::vector<int64_t> new_shape = {num_outputs};
   module::setShapeOrVerify(getOutput(), new_shape);
+}
+
+void ops::ListOp::type_inference() {
+  llvm_unreachable("not support type inference for list op yet. ");
 }

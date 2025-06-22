@@ -7,7 +7,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
 void ops::PackOp::shape_inference() {}
+
+void ops::PackOp::type_inference() {
+  broadcast_type_inference(getOperation());
+}

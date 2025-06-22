@@ -11,6 +11,7 @@
 #include "support/float8.h"
 #include "support/module.h"
 #include "support/mathutil.h"
+#include <cstdint>
 
 using namespace tbc::ops;
 
@@ -200,6 +201,9 @@ template Value WeightOp::create(Operation *OwnerOp, llvm::StringRef name,
                                 RankedTensorType &type);
 template Value WeightOp::create(Operation *OwnerOp, llvm::StringRef name,
                                 const std::vector<uint32_t> &data,
+                                RankedTensorType &type);
+template Value WeightOp::create(Operation *OwnerOp, llvm::StringRef name,
+                                const std::vector<int64_t> &data,
                                 RankedTensorType &type);
 
 Value WeightOp::clone_bf16(Operation *OwnerOp, std::string name) {

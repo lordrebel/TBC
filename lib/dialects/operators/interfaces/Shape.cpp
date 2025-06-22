@@ -35,3 +35,8 @@ void ops::ShapeOp::shape_inference() {
     module::bindShapeTensorValue(getOutput(), module::getShape(getInput()));
   }
 }
+void ops::ShapeOp::type_inference() {
+  module::setElementType(getOutput(), mlir::IntegerType::get(
+      getContext(), 64)); // Shape is always int64_t, so use IntegerType with 64 bits
+
+}

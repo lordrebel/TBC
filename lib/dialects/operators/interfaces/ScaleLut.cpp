@@ -7,9 +7,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 
 
 void ops::ScaleLutOp::shape_inference() {
   common_shape_inference(getOperation());
+}
+void ops::ScaleLutOp::type_inference() {
+  common_type_inference(getOperation());
 }

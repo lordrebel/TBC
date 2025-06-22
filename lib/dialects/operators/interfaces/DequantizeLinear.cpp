@@ -8,8 +8,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "support/module.h"
+#include "llvm/Support/ErrorHandling.h"
 
 
 void ops::DequantizeLinearOp::shape_inference() {
   common_shape_inference(getOperation());
+}
+
+void ops::DequantizeLinearOp::type_inference() {
+  llvm_unreachable("DequantizeLinearOp type inference is not implemented yet.");
 }

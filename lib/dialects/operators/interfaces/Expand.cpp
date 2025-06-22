@@ -42,3 +42,6 @@ void ops::ExpandOp::shape_inference() {
   }
 
 }
+void ops::ExpandOp::type_inference() {
+  common_type_inference(getOperation());
+}

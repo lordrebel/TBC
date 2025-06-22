@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
@@ -30,4 +31,7 @@ void ops::ArgOp::shape_inference() {
   if (!module::isNone(getValues())) {
     module::setShapeOrVerify(getValues(), output_shape);
   }
+}
+void ops::ArgOp::type_inference() {
+  common_type_inference(getOperation());
 }

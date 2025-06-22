@@ -12,3 +12,9 @@
 void ops::SigmoidOp::shape_inference() {
   common_shape_inference(getOperation());
 }
+
+void ops::SigmoidOp::type_inference() {
+  auto input = getInput();
+  auto output = getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

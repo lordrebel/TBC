@@ -11,3 +11,6 @@
 
 
 void ops::ExpOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::ExpOp::type_inference() {
+  common_type_inference(getOperation());
+}

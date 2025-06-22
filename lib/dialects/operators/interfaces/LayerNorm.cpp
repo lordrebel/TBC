@@ -40,3 +40,6 @@ void ops::LayerNormOp::shape_inference() {
   }
 
 }
+void ops::LayerNormOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

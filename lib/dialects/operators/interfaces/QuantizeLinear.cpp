@@ -12,3 +12,6 @@
 void ops::QuantizeLinearOp::shape_inference() {
   common_shape_inference(getOperation());
 }
+void ops::QuantizeLinearOp::type_inference() {
+ llvm_unreachable("QuantizeLinearOp type inference is not implemented yet.");
+}

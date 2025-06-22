@@ -8,6 +8,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "support/module.h"
+#include "llvm/Support/ErrorHandling.h"
 
 
 
@@ -27,4 +28,9 @@ void ops::ConstantFillOp::shape_inference() {
     auto out_shape = module::getShapeTensorValue(getInput());
     module::setShapeOrVerify(getOutput(), out_shape);
   }
+}
+
+void ops::ConstantFillOp::type_inference() {
+  //TODO: finish this with converter
+  llvm_unreachable("ConstantFillOp type inference not implemented yet");
 }

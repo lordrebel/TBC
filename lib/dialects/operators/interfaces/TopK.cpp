@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 
 
@@ -35,6 +36,16 @@ void ops::TopKOp::shape_inference() {
   }
   module::setShapeOrVerify(getValues(), output_shape);
   module::setShapeOrVerify(getIndices(), output_shape);
+}
+
+void ops::TopKOp::type_inference() {
+  auto input=getInput();
+  auto output=getValues();
+  auto indices=getIndices();
+  module::setElementType(output, module::getElementType(input));
+  module::setElementType(indices, mlir::IntegerType::get(
+      module::getCtx(), 64)); // Indices are always int64_t, so use IntegerType with 64 bits
+
 }
 
 

@@ -578,6 +578,10 @@ template void npz_add_array<uint16_t>(npz_t &, std::string,
 template void npz_add_array<int32_t>(npz_t &, std::string,
         const std::vector<int32_t> &);
 
+//maybe not okey?
+template void npz_add_array<int64_t>(npz_t &, std::string,
+        const std::vector<int64_t> &);
+
 void npz_save_all(std::string zipname, npz_t &map) {
     for (auto it = map.begin(); it != map.end(); it++) {
         std::string mode = (it == map.begin()) ? "w" : "a";

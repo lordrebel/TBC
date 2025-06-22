@@ -78,3 +78,8 @@ void ops::SliceOp::shape_inference() {
    llvm_unreachable("not support shape op in shape inference yet, ");
   }
 }
+void ops::SliceOp::type_inference() {
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

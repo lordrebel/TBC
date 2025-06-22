@@ -9,3 +9,7 @@
 
 #include "support/module.h"
 void ops::AttentionOp::shape_inference() {}
+void ops::AttentionOp::type_inference() {
+  auto type=module::getElementType(getInput());
+  module::setElementType(getOutput(), type);
+}

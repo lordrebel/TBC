@@ -51,3 +51,6 @@ void ops::InterpOp::shape_inference() {
     }
 }
 
+void ops::InterpOp::type_inference() {
+    module::setElementType(getOutput(), module::getElementType(getInput()));
+}

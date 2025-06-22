@@ -16,6 +16,7 @@ add_mlir_library(TBCOperators
   MLIROperatorsIncGen
   MLIROperatorDialectPassIncGen
   MLIRShapeInferInterfaceIncGen
+  MLIRTypeInferInterfaceIncGen
 
   LINK_LIBS PUBLIC
   MLIRIR
@@ -27,4 +28,5 @@ add_mlir_library(TBCOperators
   MLIRTransforms
 	MLIRTBCSupport
   MLIRShapeInferInterface
+  MLIRTypeInferInterface
 )

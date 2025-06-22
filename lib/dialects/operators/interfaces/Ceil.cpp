@@ -12,3 +12,5 @@
 
 
 void ops::CeilOp::shape_inference() { common_shape_inference(getOperation()); }
+
+void ops::CeilOp::type_inference() { common_type_inference(getOperation()); }

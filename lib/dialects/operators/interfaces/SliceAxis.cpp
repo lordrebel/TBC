@@ -62,3 +62,9 @@ void ops::SliceAxisOp::shape_inference() {
   out_shape[axis] = (end - start + step - 1) / step;
   module::setShapeOrVerify(getOutput(), out_shape);
 }
+
+void ops::SliceAxisOp::type_inference() {
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

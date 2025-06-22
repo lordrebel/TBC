@@ -7,6 +7,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
@@ -24,4 +26,7 @@ void ops::MeshGridOp::shape_inference() {
     auto out = getResult(i);
     module::setShapeOrVerify(out, out_shape);
   }
+}
+void ops::MeshGridOp::type_inference(){
+  broadcast_type_inference(getOperation());
 }

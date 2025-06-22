@@ -17,3 +17,6 @@ static inline double hswish(double x) {
 void ops::HardSwishOp::shape_inference() {
   common_shape_inference(getOperation());
 }
+void ops::HardSwishOp::type_inference() {
+  common_type_inference(getOperation());
+}

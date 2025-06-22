@@ -1,5 +1,6 @@
 
 #include "mlir/IR/BuiltinTypes.h"
+#include <cstdint>
 #include "support/tensorfile.h"
 
 using namespace mlir;
@@ -224,6 +225,10 @@ TensorFile::addTensor<unsigned int>(llvm::StringRef name,
                                     RankedTensorType &type);
 template LogicalResult TensorFile::addTensor<int>(llvm::StringRef name,
                                                   const std::vector<int> *data,
+                                                  RankedTensorType &type);
+                                                  
+template LogicalResult TensorFile::addTensor<int64_t>(llvm::StringRef name,
+                                                  const std::vector<int64_t> *data,
                                                   RankedTensorType &type);
 
 template LogicalResult TensorFile::updateTensorData(llvm::StringRef name,

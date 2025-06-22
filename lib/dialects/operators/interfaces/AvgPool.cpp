@@ -135,3 +135,6 @@ void ops::AvgPoolOp::shape_inference() {
   }
   module::setShapeOrVerify(getOutput(), out_shape);
 }
+void ops::AvgPoolOp::type_inference() {
+  common_type_inference(getOperation());
+}

@@ -25,3 +25,10 @@ void ops::RepeatOp::shape_inference() {
   }
   module::setShapeOrVerify(getOutput(), out_shape);
 }
+
+void ops::RepeatOp::type_inference() {
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
+
+}

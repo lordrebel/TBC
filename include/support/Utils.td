@@ -77,18 +77,26 @@ def PaddingMode: I32EnumAttr<"PaddingMode",
   let cppNamespace = "::tbc::utils";
 }
 
-def WeightStorageType: I32EnumAttr<"WeightStorageType", "module mode",[
+def DataType: I32EnumAttr<"DataType", "represent datatype",[
       I32EnumAttrCase<"INT8",  0>,
       I32EnumAttrCase<"UINT8", 1>,
       I32EnumAttrCase<"INT32",  2>,
       I32EnumAttrCase<"UINT32",  3>,
       I32EnumAttrCase<"INT16",  4>,
       I32EnumAttrCase<"UINT16",  5>,
-      I32EnumAttrCase<"F32",   6>,
-      I32EnumAttrCase<"F64",   7>,
-      I32EnumAttrCase<"F8",20>,
-      I32EnumAttrCase<"BF16",  21>,
-      I32EnumAttrCase<"F16",   22>,
+      I32EnumAttrCase<"INT64",  6>,
+      I32EnumAttrCase<"UINT64",  7>,
+      I32EnumAttrCase<"BOOL",  8>,
+      I32EnumAttrCase<"INT4",  9>,
+      I32EnumAttrCase<"UINT4", 10>,
+      
+      I32EnumAttrCase<"F32",   20>,
+      I32EnumAttrCase<"F64",   21>,
+      I32EnumAttrCase<"F8E4M3",22>,
+      I32EnumAttrCase<"F8E5M2",23>,
+      I32EnumAttrCase<"BF16",  24>,
+      I32EnumAttrCase<"F16",   25>,
+      I32EnumAttrCase<"TF32",    26>,
     ]> {
   let genSpecializedAttr = 0;
   let cppNamespace = "::tbc::utils";

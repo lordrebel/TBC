@@ -12,3 +12,6 @@
 
 
 void ops::UnpackOp::shape_inference() {}
+void ops::UnpackOp::type_inference() {
+  common_type_inference(getOperation());
+}

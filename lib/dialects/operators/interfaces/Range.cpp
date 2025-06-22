@@ -52,3 +52,6 @@ void ops::RangeOp::shape_inference() {
   auto out_size = (limit - start) / delta;
   module::setShapeOrVerify(getOutput(), {out_size});
 }
+void ops::RangeOp::type_inference() {
+  broadcast_type_inference(getOperation());
+}

@@ -17,3 +17,7 @@ void ops::MinConstOp::shape_inference() {
     llvm_unreachable("not support input shape inference for MinConsops");
   }
 }
+
+void ops::MinConstOp::type_inference() {
+  common_type_inference(getOperation());
+}

@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 
 void ops::SplitOp::shape_inference() {
@@ -32,4 +33,8 @@ void ops::SplitOp::shape_inference() {
     out_shape[axis] = out_size[i];
     module::setShapeOrVerify(out, out_shape);
   }
+}
+
+void ops::SplitOp::type_inference(){
+  common_type_inference(getOperation());
 }

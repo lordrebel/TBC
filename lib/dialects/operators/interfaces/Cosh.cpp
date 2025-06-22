@@ -12,3 +12,6 @@
 
 
 void ops::CoshOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::CoshOp::type_inference() {
+  common_type_inference(getOperation());
+}

@@ -7,7 +7,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
 void ops::ScaleOp::shape_inference() { common_shape_inference(getOperation()); }
+
+void ops::ScaleOp::type_inference() { broadcast_type_inference(getOperation()); }

@@ -11,8 +11,15 @@
 
 void ops::MaskedFillOp::shape_inference() {
   broadcast_shape_inference(getOperation());
-  for(int i = 0; i< getNumOperands(); ++i) {
+  for (int i = 0; i < getNumOperands(); ++i) {
     auto value = getOperation()->getOperand(i);
     broadcast_tensor_reshape(getOutput(), value);
   }
+}
+void ops::MaskedFillOp::type_inference() {
+  common_type_inference(getOperation());
+  auto output = getOutput();
+  auto input = getBrn();
+
+  module::setElementType(output, module::getElementType(input));
 }

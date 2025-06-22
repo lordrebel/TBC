@@ -13,3 +13,5 @@
 void ops::AddConstOp::shape_inference() {
   common_shape_inference(getOperation());
 }
+//TODO:maybe consider the const value?
+void ops::AddConstOp::type_inference() { common_type_inference(getOperation()); }

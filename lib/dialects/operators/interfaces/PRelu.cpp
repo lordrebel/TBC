@@ -7,7 +7,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 
 
 void ops::PReluOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::PReluOp::type_inference(){
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 
 
@@ -31,4 +32,9 @@ void ops::TileOp::shape_inference() {
   std::transform(tile_vec.begin(), tile_vec.end(), in0_shape.begin(), out_shape.begin(),
         [](int a, int b){return a * b;});
   module::setShapeOrVerify(getOutput(), out_shape);
+}
+void ops::TileOp::type_inference() {
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
 }

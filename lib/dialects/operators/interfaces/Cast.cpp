@@ -8,6 +8,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "support/module.h"
+#include "llvm/Support/ErrorHandling.h"
 
 
 void ops::CastOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::CastOp::type_inference() {
+  //TODO: finish this with converter
+  llvm_unreachable("not implemented yet");
+}

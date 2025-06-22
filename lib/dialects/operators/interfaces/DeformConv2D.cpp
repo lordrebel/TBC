@@ -87,3 +87,7 @@ void ops::DeformConv2DOp::shape_inference() {
   }
   module::setShapeOrVerify(getOutput(), out_shape);
 }
+
+void ops::DeformConv2DOp::type_inference() {
+broadcast_type_inference(getOperation());
+}

@@ -103,6 +103,7 @@ class OnnxConverter(BaseConverter):
     def __init__(self,
                  model_name: str,
                  onnx_file,
+                 mode:str,
                  input_shapes: list,
                  output_names: list,
                  without_simplfy=False,
@@ -132,6 +133,7 @@ class OnnxConverter(BaseConverter):
         self.mlir = None
         self.node_name_mapping = {}  # used in onnx opt
         self.onnx_sim = onnx_sim
+        self.mode=mode
         self.load_onnx_model(onnx_file, input_shapes, output_names, without_simplfy)
         self.init_MLIRImporter()
         self.unranked_type = self.mlir.get_tensor_type([])
@@ -530,6 +532,7 @@ class OnnxConverter(BaseConverter):
             output_shapes.append(self.getShape(_name))
         # init importer
         self.mlir = MLIRImporter(input_shapes, output_shapes, self.model_name, Platform.ONNX,
+                                 self.mode,
                                  self.input_types,self.output_types)
         self.weight_file = self.mlir.weight_file
 

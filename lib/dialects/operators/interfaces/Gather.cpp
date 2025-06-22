@@ -43,3 +43,7 @@ void ops::GatherOp::shape_inference() {
     llvm_unreachable("not implemented for shape inference of gather op with input shape");
   }
 }
+
+void ops::GatherOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

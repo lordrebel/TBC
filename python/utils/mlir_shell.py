@@ -57,7 +57,7 @@ def _os_system(cmd: list, save_log: bool = False):
 
 
 def mlir_opt_for_operator(mlirfile, opt_mlirfile):
-    cmd = ["tbc-opt", mlirfile, "--shape-infer"]
+    cmd = ["tbc-opt", mlirfile, "--shape-infer","--type-infer"]
     cmd.extend(["--canonicalize"," --assign-compile-phase=\"compile_phase=OPERATOR_OPTED\" " ,"-o", opt_mlirfile])
     _os_system(cmd)
 

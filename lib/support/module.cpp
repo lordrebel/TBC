@@ -8,6 +8,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/BuiltinTypes.h"
+#include "mlir/IR/Value.h"
 #include "support/mathutil.h"
 #include "support/tensorfile.h"
 #include<cstdint>
@@ -421,6 +423,77 @@ Type getElementType(Value v) {
   return type;
 }
 
+void setElementType(Value v, Type type) {
+  if(isUnranked(v)){
+    v.setType(UnrankedTensorType::get(type));
+  }
+  else if (isa<RankedTensorType>(v.getType())) {
+    auto shape = getShape(v);
+    auto newType = RankedTensorType::get(shape, type);
+    v.setType(newType);
+  } else if(isa<NoneType>(v.getType())) {
+    llvm::outs() << "v is NoneType skip setting element type\n";
+
+  } else {
+    v.getDefiningOp()->getParentOp()->dump();
+    v.dump();
+    llvm_unreachable("setElementType failed");
+  }
+}
+ bool allInputsAreNone(mlir::Operation *op) {
+    return std::all_of(op->getOperands().begin(), op->getOperands().end(), [](mlir::Value v){
+      return isa<mlir::NoneType>(v.getType());
+    });
+  }
+  bool allInputsAreSameElementType(mlir::Operation *op) {
+    auto nums=op->getNumOperands();
+    if(nums<1) return true;
+    Type firstType= nullptr;
+    for(size_t i=0;i<nums;i++){
+      auto type=op->getOperand(i).getType();
+      if(isa<mlir::NoneType>(type)) continue;
+      else{
+        firstType=module::getElementType(op->getOperand(i));
+        break;
+      }
+    }
+    if(firstType==nullptr) return true; // 全部是NoneType
+
+    for(size_t i=0;i<nums;i++){
+      auto type=op->getOperand(i).getType();
+      if(mlir::isa<mlir::NoneType>(type)) continue; // 跳过NoneType
+      if(module::getElementType(op->getOperand(i))!=firstType){
+        return false;
+      }
+    }
+    return true;
+  }
+bool allInputsAreFloatElementType(mlir::Operation *op){
+  size_t nums=op->getNumOperands();
+  if(nums<1) return false;
+  for(size_t i=0;i<nums;i++){
+    auto type=op->getOperand(i).getType();
+    if(mlir::isa<mlir::NoneType>(type)) continue;
+    if(!mlir::isa<FloatType>(getElementType(op->getOperand(i)))){
+      return false;
+    }
+  }
+  return true;
+
+}
+bool allInputsAreIntElementType(mlir::Operation *op){
+  size_t nums=op->getNumOperands();
+  if(nums<1) return false;
+  for(size_t i=0;i<nums;i++){
+    auto type=op->getOperand(i).getType();
+    if(mlir::isa<mlir::NoneType>(type)) continue;
+    if(!mlir::isa<mlir::IntegerType>(getElementType(op->getOperand(i)))){
+      return false;
+    }
+  }
+  return true;
+}
+
 RankedTensorType getTypeLike(Value v, llvm::ArrayRef<int64_t> shape) {
   return RankedTensorType::get(shape, getElementType(v));
 }
@@ -592,6 +665,7 @@ void setShapeOrVerify(Value v, llvm::ArrayRef<int64_t> shape) {
     /* unranked tensor is okay, for example:
        tensor<*xf32>->tensor<1xf32> */
     if ((std::max(s.size(), shape.size()) > 1) && s != shape) {
+      v.getDefiningOp()->getParentOp()->dump();
       v.dump();
       llvm_unreachable("Shape Verify failed");
     }

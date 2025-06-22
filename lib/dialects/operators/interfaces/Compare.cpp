@@ -26,3 +26,9 @@ void ops::CompareOp::shape_inference() {
     llvm_unreachable("not support shape value inference for compare op yet. ");
   }
 }
+
+void ops::CompareOp::type_inference() {
+  auto op=getOperation();
+  auto boolType=IntegerType::get(op->getContext(), 1);
+  module::setElementType(this->getOutput(), boolType);
+}

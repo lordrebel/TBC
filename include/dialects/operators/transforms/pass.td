@@ -30,4 +30,10 @@ def ShapeInfer : Pass<"shape-infer", "ModuleOp"> {
   let constructor = "createShapeInferPass()";
   let dependentDialects = ["OperatorDialect"];
 }
+
+def TypeInfer : Pass<"type-infer", "ModuleOp"> {
+  let summary = "do type inference for each op";
+  let constructor = "createTypeInferPass()";
+  let dependentDialects = ["OperatorDialect"];
+}
 #endif

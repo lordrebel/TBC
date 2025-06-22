@@ -7,6 +7,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 void ops::Pow2Op::shape_inference() { common_shape_inference(getOperation()); }
+void ops::Pow2Op::type_inference(){
+  common_type_inference(getOperation());
+}

@@ -7,7 +7,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 void ops::CopyOp::shape_inference() {}
 
+void ops::CopyOp::type_inference() {
+  common_type_inference(getOperation());
+}

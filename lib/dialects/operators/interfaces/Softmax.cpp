@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 void ops::SoftmaxOp::shape_inference() {
@@ -17,4 +18,8 @@ void ops::SoftmaxOp::shape_inference() {
     axis += in_shape.size();
     setAxis(axis);
   }
+}
+
+void ops::SoftmaxOp::type_inference() {
+ common_type_inference(getOperation());
 }

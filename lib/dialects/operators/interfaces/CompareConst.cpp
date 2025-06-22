@@ -17,3 +17,9 @@ void ops::CompareConstOp::shape_inference() {
     llvm_unreachable("not support shape inference for compare const op yet. ");
   }
 }
+
+void ops::CompareConstOp::type_inference() {
+  auto op=getOperation();
+  auto boolType=IntegerType::get(op->getContext(), 1);
+  module::setElementType(this->getOutput(), boolType);
+}

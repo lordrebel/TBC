@@ -21,3 +21,9 @@ void ops::MaxUnpoolOp::shape_inference() {
   out_shape.push_back(scale_w_ * W);
   module::setShapeOrVerify(getOutput(), out_shape);
 }
+
+void ops::MaxUnpoolOp::type_inference() {
+  auto input = getInput();
+  auto output = getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

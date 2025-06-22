@@ -13,3 +13,8 @@
 void ops::SignOp::shape_inference() {
   common_shape_inference(getOperation());
 }
+void ops::SignOp::type_inference() {
+  auto input = getInput();
+  auto output = getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

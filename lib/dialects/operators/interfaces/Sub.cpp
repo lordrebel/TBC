@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
@@ -17,3 +18,4 @@ void ops::SubOp::shape_inference() {
     broadcast_tensor_reshape(getOutput(), value);
   }
 }
+void ops::SubOp::type_inference(){broadcast_type_inference(getOperation());}

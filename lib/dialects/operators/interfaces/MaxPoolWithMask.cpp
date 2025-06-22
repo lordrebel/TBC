@@ -61,3 +61,7 @@ void ops::MaxPoolWithMaskOp::shape_inference() {
   module::setShapeOrVerify(getOutput(), out_shape);
   module::setShapeOrVerify(getMask(), out_shape);
 }
+
+void ops::MaxPoolWithMaskOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

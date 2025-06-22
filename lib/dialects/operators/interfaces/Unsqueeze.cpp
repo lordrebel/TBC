@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 #include "llvm/Support/ErrorHandling.h"
 
@@ -31,4 +32,10 @@ void ops::UnsqueezeOp::shape_inference() {
   if (module::isShape(getInput())) {
     llvm_unreachable("not supported shape inference for unsqueeze op yet");
   }
+}
+
+void ops::UnsqueezeOp::type_inference() {
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
 }

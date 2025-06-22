@@ -13,3 +13,7 @@ void ops::GatherElementsOp::shape_inference() {
   auto indices_shape = module::getShape(getIndices());
   module::setShapeOrVerify(getOutput(), indices_shape);
 }
+
+void ops::GatherElementsOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

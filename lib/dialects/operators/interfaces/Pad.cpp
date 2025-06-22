@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 void ops::PadOp::shape_inference() {
@@ -34,4 +35,7 @@ void ops::PadOp::shape_inference() {
   for (int i = 0; i < dim; i++)
     out_shape[i] += pads[i] + pads[i + dim];
   module::setShapeOrVerify(getOutput(), out_shape);
+}
+void ops::PadOp::type_inference() {
+  common_type_inference(getOperation());
 }

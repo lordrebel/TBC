@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
 #include "support/module.h"
 
 
@@ -25,4 +26,9 @@ void ops::ViewOp::shape_inference() {
       getLoc(), out.getType(), ArrayRef<Value>{getInput()}, attrs);
   out.replaceAllUsesWith(new_op.getOutput());
   new_op.shape_inference();
+}
+void ops::ViewOp::type_inference() {
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
 }

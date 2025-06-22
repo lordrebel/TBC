@@ -11,3 +11,5 @@
 
 
 void ops::TanOp::shape_inference() { common_shape_inference(getOperation()); }
+void ops::TanOp::type_inference() { common_type_inference(getOperation()); }
+

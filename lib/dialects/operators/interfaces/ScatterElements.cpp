@@ -13,3 +13,8 @@ void ops::ScatterElementsOp::shape_inference() {
   auto in_shape = module::getShape(getInput());
   module::setShapeOrVerify(getOutput(), in_shape);
 }
+void ops::ScatterElementsOp::type_inference() {
+  auto input=getInput();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
+}

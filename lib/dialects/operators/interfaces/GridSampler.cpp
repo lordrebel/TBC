@@ -31,3 +31,7 @@ void ops::GridSamplerOp::shape_inference() {
     module::setShape(getGrid(), new_shape);
   }
 }
+
+void ops::GridSamplerOp::type_inference() {
+  module::setElementType(getOutput(), module::getElementType(getInput()));
+}

@@ -7,6 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 void ops::NmsOp::shape_inference() {
@@ -22,4 +23,8 @@ void ops::NmsOp::shape_inference() {
   std::vector<int64_t> output_shape{0,3};
   output_shape[0] = class_num * max_output_size_per_class;
   module::setShapeOrVerify(getOutput(), output_shape);
+}
+
+void ops::NmsOp::type_inference() {
+  broadcast_type_inference(getOperation());
 }

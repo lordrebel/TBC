@@ -11,3 +11,10 @@
 
 
 void ops::ScatterNDOp::shape_inference() { common_shape_inference(getOperation()); }
+
+void ops::ScatterNDOp::type_inference() {
+  auto input=getInputData();
+  auto output=getOutput();
+  module::setElementType(output, module::getElementType(input));
+
+}

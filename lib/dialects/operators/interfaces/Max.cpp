@@ -7,6 +7,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "dialects/operators/IR/operator.h"
+#include "interfaces/typeInfer_interface.h"
 #include "support/module.h"
 
 
@@ -16,4 +18,8 @@ void ops::MaxOp::shape_inference() {
     auto value = getInputs()[i];
     broadcast_tensor_reshape(getOutput(), value);
   }
+}
+
+void ops::MaxOp::type_inference(){
+  broadcast_type_inference(getOperation());
 }
