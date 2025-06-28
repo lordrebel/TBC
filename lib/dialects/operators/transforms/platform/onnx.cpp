@@ -6,7 +6,7 @@ class OnnxPassCollector: public IPlatformPassCollector{
   public:
     virtual void operator() (mlir::PassManager & pm)final {
       //for test
-      pm.addPass(createPrintOpNamePass());
+      //pm.addPass(createPrintOpNamePass());
 
     };
 };
