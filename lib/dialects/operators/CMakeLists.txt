@@ -3,6 +3,7 @@ file(GLOB _sources
           interfaces/*.cpp
           canonicalize/*.cpp
           transforms/*.cpp
+          transforms/platform/*.cpp
     )
 
 add_mlir_library(TBCOperators
@@ -15,6 +16,7 @@ add_mlir_library(TBCOperators
   MLIROperatorDialectAttrGen
   MLIROperatorsIncGen
   MLIROperatorDialectPassIncGen
+  MLIRPlatformPassIncGen
   MLIRShapeInferInterfaceIncGen
   MLIRTypeInferInterfaceIncGen
 

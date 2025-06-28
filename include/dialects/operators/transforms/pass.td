@@ -36,4 +36,10 @@ def TypeInfer : Pass<"type-infer", "ModuleOp"> {
   let constructor = "createTypeInferPass()";
   let dependentDialects = ["OperatorDialect"];
 }
+
+def PlatformDependent : Pass<"platform-opt", "ModuleOp"> {
+  let summary = "extra optimize based on specific platform";
+  let constructor = "createPlatformDependentPass()";
+  let dependentDialects = ["OperatorDialect"];
+}
 #endif

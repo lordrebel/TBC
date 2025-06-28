@@ -18,7 +18,7 @@ public:
     // Do shape infer
     for (auto func : mOp.getOps<FuncOp>()) {
       func.walk([&](TypeInferInterface op) {
-        LLVM_DEBUG(llvm::dbgs() << "shape infer: " << op << "\n";);
+        LLVM_DEBUG(llvm::dbgs() << "type infer: " << op << "\n";);
         op.type_inference();
       });
     }
