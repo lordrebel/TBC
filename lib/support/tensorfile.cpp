@@ -34,7 +34,10 @@ template <typename T> static bool check_type(Type eltType) {
     same = std::is_same<T, uint8_t>::value;
   } else if (eltType.isFloat8E5M2()) {
     same = std::is_same<T, uint8_t>::value;
-  } else {
+  } else if (eltType.isInteger(64)) {
+     same = std::is_same<T, int64_t>::value;
+  }
+  else {
     // eltType.isF64()
     // ...
     same = false;
@@ -226,7 +229,7 @@ TensorFile::addTensor<unsigned int>(llvm::StringRef name,
 template LogicalResult TensorFile::addTensor<int>(llvm::StringRef name,
                                                   const std::vector<int> *data,
                                                   RankedTensorType &type);
-                                                  
+
 template LogicalResult TensorFile::addTensor<int64_t>(llvm::StringRef name,
                                                   const std::vector<int64_t> *data,
                                                   RankedTensorType &type);
@@ -246,8 +249,13 @@ TensorFile::readTensor<unsigned int>(llvm::StringRef name,
                                      RankedTensorType &type);
 template std::unique_ptr<std::vector<short>>
 TensorFile::readTensor<short>(llvm::StringRef name, RankedTensorType &type);
+template std::unique_ptr<std::vector<long>>
+TensorFile::readTensor<long>(llvm::StringRef name,
+                                    RankedTensorType &type);
 template std::unique_ptr<std::vector<float>>
 TensorFile::readTensor<float>(llvm::StringRef name, RankedTensorType &type);
+template std::unique_ptr<std::vector<double>>
+TensorFile::readTensor<double>(llvm::StringRef name, RankedTensorType &type);
 template std::unique_ptr<std::vector<unsigned char>>
 TensorFile::readTensor<unsigned char>(llvm::StringRef name,
                                       RankedTensorType &type);

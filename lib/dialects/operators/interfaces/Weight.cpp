@@ -78,6 +78,10 @@ std::shared_ptr<std::vector<float>> WeightOp::read_as_float() {
     auto data_i32 = read<int32_t>();
     return std::make_shared<std::vector<float>>(data_i32->begin(),
                                                 data_i32->end());
+  }else if(dtype.isInteger(64)){
+     auto data_i64 = read<int64_t>();
+    return std::make_shared<std::vector<float>>(data_i64->begin(),
+                                                data_i64->end());
   }
   dump();
   llvm_unreachable("weight data not support read as float now");
@@ -181,6 +185,8 @@ template std::shared_ptr<std::vector<int16_t>> WeightOp::read();
 template std::shared_ptr<std::vector<uint16_t>> WeightOp::read();
 template std::shared_ptr<std::vector<uint8_t>> WeightOp::read();
 template i32_array_t WeightOp::read();
+template i64_array_t WeightOp::read();
+template f64_array_t WeightOp::read();
 template Value WeightOp::create(Operation *OwnerOp, llvm::StringRef name,
                                 const std::vector<float> &data,
                                 RankedTensorType &type);

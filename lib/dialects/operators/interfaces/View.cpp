@@ -9,11 +9,13 @@
 
 #include "dialects/operators/IR/operator.h"
 #include "support/module.h"
+#include "llvm/Support/raw_ostream.h"
 
 
 void ops::ViewOp::shape_inference() {
   auto weight = cast<ops::WeightOp>(getShape().getDefiningOp());
-  auto shape = weight.read<float>();
+  auto shape = weight.read_as_float();
+
   std::vector<int64_t> shape_(shape->begin(), shape->end());
   auto op = getOperation();
   OpBuilder builder(module::getCtx());

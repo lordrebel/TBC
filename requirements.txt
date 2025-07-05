@@ -2,4 +2,5 @@ pybind == 2.10.3
 numpy == 1.26.0
 onnxsim == 0.4.36
 onnx >= 1.15.0
-onnxruntime 
+plotly
+onnxruntime

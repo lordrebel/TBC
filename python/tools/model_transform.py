@@ -82,13 +82,20 @@ class TorchTransformer(ModelTransformer):
     def __init__(self,
                  model_name,
                  model_path,
-                mode="F32",
+                 mode="F32",
                  input_shapes: list = [],
                  input_types: list = [],
                  output_names: list = [],
-                 preprocessor: dict = {},
                  without_simplfy=False):
         super().__init__(model_name, model_path,without_simplfy)
+        from transform.TorchConverter import TorchConverter
+        self.converter = TorchConverter(self.model_name,
+                                       self.model_path,
+                                       mode,
+                                       input_shapes,
+                                       input_types,
+                                       output_names)
+    def origin_inference(self, inputs: dict):
         pass
 
 def get_model_transform(args):
@@ -105,7 +112,7 @@ def get_model_transform(args):
                                args.without_simplfy,
                                onnx_sim=args.onnx_sim)
     elif args.platform == "torch":
-        tool = TorchTransformer(args.model_name, args.model_path, args.input_shapes,
+        tool = TorchTransformer(args.model_name, args.model_path, args.mode,args.input_shapes,
                                 args.input_types, args.output_names,args.without_simplfy)
     else:
         # TODO: support more deep learning model types
