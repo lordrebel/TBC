@@ -71,10 +71,8 @@ class OnnxTransformer(ModelTransformer):
                                        onnx_sim=onnx_sim)
 
     def origin_inference(self, inputs: dict):
-        pass
-
-
-
+        from tools.model_runner import onnx_inference
+        return onnx_inference(inputs, self.converter.onnx_file)
 
 
 class TorchTransformer(ModelTransformer):
@@ -96,7 +94,8 @@ class TorchTransformer(ModelTransformer):
                                        input_types,
                                        output_names)
     def origin_inference(self, inputs: dict):
-        pass
+        from tools.model_runner import torch_inference
+        return torch_inference(inputs, self.model_def)
 
 def get_model_transform(args):
 
