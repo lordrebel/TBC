@@ -52,5 +52,6 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 - [ ] add svjson converter
 - [X] add platform dependent pass for optmize imported model
 - [ ] import `pdll` rewrite the canonical patterns
+- [ ] import `transform` dialect to do transform dynamically
 - [ ] consider using safetensor instead of cnpy
 - [ ] kernel dialect design
