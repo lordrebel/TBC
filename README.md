@@ -48,8 +48,9 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 ## TODO List
 - [X] test fp8/fp16 onnx model import
 - [X] update cast/quantize/dequantize op type infer and converter
-- [ ] add torch converter
+- [X] add torch converter
 - [ ] add svjson converter
 - [X] add platform dependent pass for optmize imported model
+- [ ] import `pdll` rewrite the canonical patterns
 - [ ] consider using safetensor instead of cnpy
 - [ ] kernel dialect design
