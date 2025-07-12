@@ -1,0 +1,15 @@
+
+#include "dialects/operators/pdll/CommonConstraints.pdll"
+
+// 创建常量属性
+Rewrite CreateConstAttr(value: Value) -> Attr [{
+  if (auto weightOp = dyn_cast<tbc::ops::WeightOp>(value.getDefiningOp())) {
+    auto const_val = weightOp.read_as_float<float>();
+    if (const_val && const_val->size() > 0) {
+      return $_builder.getF64FloatAttr(const_val->at(0));
+    }
+  }
+  return {};
+}];
+
+

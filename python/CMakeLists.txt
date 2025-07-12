@@ -5,7 +5,8 @@ mlir_configure_python_dev_packages()
 
 set(TBC_PYTHON_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tbc")
 set(TBC_PYTHON_PACKAGES_DIR "${CMAKE_BINARY_DIR}/python")
-
+set(TBC_PYTHON_EXTRA_MODULES)
+set(TBC_PYTHON_EXTRA_LIBS)
 ################################################################################
 # Structural groupings.
 ################################################################################
@@ -37,6 +38,23 @@ declare_mlir_python_extension(TBCPythonExtension.RegisterEverything
     MLIRCAPITransforms
     TBCCAPI
 )
+###################################################
+#extra bindings
+###################################################
+if(ENABLE_TBC_PYTHON_EXTRA)
+
+  list(APPEND TBC_PYTHON_EXTRA_MODULES
+      MLIRPythonSources.Dialects.pdl
+      MLIRPythonSources.Dialects.transform
+      MLIRPythonSources.Dialects.transform.extras
+      MLIRPythonSources.Dialects.transform.interpreter
+
+  )
+
+  list(APPEND TBC_PYTHON_EXTRA_LIBS
+      MLIRCAPIPDL
+      MLIRCAPITransformDialect)
+endif()
 
 ################################################################################
 # Common CAPI dependency DSO.
@@ -54,8 +72,9 @@ add_mlir_python_common_capi_library(TBCPythonCAPI
     TBCPythonSources
     TBCPythonExtension.RegisterEverything
     MLIRPythonSources.Core
+    ${TBC_PYTHON_EXTRA_MODULES}
   EMBED_LIBS
-
+   ${TBC_PYTHON_EXTRA_LIBS}
 )
 
 ################################################################################

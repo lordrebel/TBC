@@ -1,0 +1,58 @@
+
+#include "mlir/IR/OpBase.td"
+
+//===----------------------------------------------------------------------===//
+// 通用操作约束
+//===----------------------------------------------------------------------===//
+
+// 检查操作是否有两个输入
+Constraint HasTwoInputs(op: Op) [{
+  return success(op->getNumOperands() == 2);
+}];
+
+
+
+//===----------------------------------------------------------------------===//
+// 类型和存储约束
+//===----------------------------------------------------------------------===//
+
+// 检查是否为F32存储类型
+Constraint IsF32StorageType(op: Op) [{
+  auto storage_type = module::getStorageType(op.getOutput());
+  return success(storage_type.isF32());
+}];
+
+// 检查是否为F16存储类型
+Constraint IsF16StorageType(op: Op) [{
+  auto storage_type = module::getStorageType(op.getOutput());
+  return success(storage_type.isF16());
+}];
+
+// 检查是否为BF16存储类型
+Constraint IsBF16StorageType(op: Op) [{
+  auto storage_type = module::getStorageType(op.getOutput());
+  return success(storage_type.isBF16());
+}];
+
+// 检查是否为F8E4M3FN存储类型
+Constraint IsF8E4M3FNStorageType(op: Op) [{
+  auto storage_type = module::getStorageType(op.getOutput());
+  return success(storage_type.isFp8E4M3FN());
+}];
+
+// 检查是否为F8E5M2存储类型
+Constraint IsF8E5M2StorageType(op: Op) [{
+  auto storage_type = module::getStorageType(op.getOutput());
+  return success(storage_type.isF8E5M2());
+}];
+
+// 检查是否为整数存储类型
+Constraint IsIntStorageType(op: Op) [{
+  auto storage_type = module::getStorageType(op.getOutput());
+  return success(storage_type.isa<IntegerType>());
+}];
+// 检查Value是否来自WeightOp
+Constraint IsWeightOp(value: Value) [{
+  return success(isa<tbc::ops::WeightOp>(module::getOriValue(value).getDefiningOp()));
+}];
+

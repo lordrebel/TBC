@@ -1,7 +1,8 @@
 
 
 #include "support/module.h"
-
+#include "mlir/Parser/Parser.h"
+#include "dialects/operators/pdll/Canonical/AddPatterns.h.inc"
 using namespace tbc::ops;
 
 struct SwapInput : public OpRewritePattern<AddOp> {
@@ -99,7 +100,6 @@ struct AddToAddConst : public OpRewritePattern<AddOp> {
     if (op.getInputs().size() != 2) {
       return failure();
     }
-
     auto coeffs = module::getF64Array(op.getCoeff(), 2, 1.0);
     for (auto c : *coeffs) {
       if (c != 1.0) {
@@ -152,5 +152,6 @@ struct AddToAddConst : public OpRewritePattern<AddOp> {
 
 void AddOp::getCanonicalizationPatterns(RewritePatternSet &results,
                                         MLIRContext *context) {
-  results.insert<SwapInput, AddToAddConst, AddToScale>(context);
+  populateGeneratedPDLLPatterns(results);
+  results.insert<AddToAddConst,AddToScale>(context);
 }

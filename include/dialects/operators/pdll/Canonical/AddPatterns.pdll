@@ -1,0 +1,60 @@
+#include "dialects/operators/pdll/CommonRewrites.pdll"
+#include "dialects/operators/IR/Operators.td"
+// 检查所有系数是否为1.0
+Constraint AllCoeffsAreOne(ori_op: Op) [{
+  auto op = cast<tbc::ops::AddOp>(ori_op);
+  if(!op.getCoeff().has_value()) return failure();
+  auto coeffs = module::getF64Array(op.getCoeff().value());
+  for (auto c : *coeffs) {
+    if (c != 1.0) return failure();
+  }
+  return success();
+}];
+
+Constraint LeftIsWeightOp(op: Op) [{
+  auto left= op->getOperand(0);
+  return success(isa<tbc::ops::WeightOp>(module::getOriValue(left).getDefiningOp()));
+}];
+
+Constraint RightIsWeightOp(op: Op) [{
+  auto right= op->getOperand(1);
+  return success(isa<tbc::ops::WeightOp>(module::getOriValue(left).getDefiningOp()));
+}];
+
+// 检查系数数组
+Constraint AllCoeffsEqual(ori_op: Op) [{
+  auto op = cast<tbc::ops::AddOp>(ori_op);
+  auto coeffs = module::getF64Array(op.getCoeff());
+  if((*coeffs).empty()) return failure();
+  auto expectedVal = (*coeffs)[0];  // 假设第一个系数为期望值
+  for (auto c : *coeffs) {
+    if (c != expectedVal) return failure();
+  }
+  return success();
+}];
+
+
+// 交换两个操作数
+Rewrite SwapOperands(ori_op: Op) -> Op [{
+  auto op = cast<tbc::ops::AddOp>(ori_op);
+  auto lhs = op.getInputs()[0];
+  auto rhs = op.getInputs()[1];
+  op.setOperand(0, rhs);
+  op.setOperand(1, lhs);
+  return op;
+}];
+
+
+// Pattern 1: SwapInput - 交换输入顺序，让Weight操作在右边
+Pattern SwapInputPattern with benefit(5) {
+  let root = op<operators.Add>(inputs:ValueRange);
+
+  // 使用constraint检查
+  HasTwoInputs(root);
+  AllCoeffsAreOne(root);
+  LeftIsWeightOp(root);
+
+  replace root with SwapOperands(root);
+
+}
+

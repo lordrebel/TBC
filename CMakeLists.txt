@@ -15,6 +15,7 @@ if(CCACHE)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE})
 endif()
+option(ENABLE_TBC_PYTHON_EXTRA "Enable Python bindings for pdl dialects" ON)
 
 #-------------------------------------------------------------------------------
 # MLIR/LLVM Configuration
