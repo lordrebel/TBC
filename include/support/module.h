@@ -5,6 +5,8 @@
 #include "mlir/Dialect/Quant/QuantTypes.h"
 #include "mlir/IR/OpDefinition.h"
 #include "dialects/operators/IR/operator.h"
+#include "mlir/Dialect/PDL/IR/PDL.h"
+#include "mlir/Dialect/PDLInterp/IR/PDLInterp.h"
 
 #include "tensorfile.h"
 

@@ -1601,6 +1601,23 @@ def Operator_AbsOp : Operator_Op<"Abs"> {
   let results = (outs AnyTensor:$output);
 }
 
+def Operator_ActivationLutOp : Operator_Op<"ActivationLut"> {
+  let summary = "ActivationLut operator";
+  let description = [{
+     Perform activation lookup table operation.
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    AnyTensor:$lut_x,
+    AnyTensor:$lut_y,
+    AnyTensor:$lut_k,
+    I64Attr:$sig_mode,
+    I64Attr:$bin_mode,
+    I64Attr:$cal_mode
+  );
+  let results = (outs AnyTensor:$output);
+}
+
 def Operator_PReluOp : Operator_Op<"PRelu"> {
   let summary = "PRelu operator";
   let description = [{

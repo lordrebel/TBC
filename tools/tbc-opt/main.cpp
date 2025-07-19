@@ -3,9 +3,9 @@
  * This file is classified as confidential level C2 within Imvision
  * @Date: 2025-06-03 11:45:51
  * Change Logs:
- * 
+ *
  * Date           Author         Notes
- * ${now_date}          wangjiahao          initialize 
+ * ${now_date}          wangjiahao          initialize
  */
 //===- mlir-opt.cpp - MLIR Optimizer Driver -------------------------------===//
 //
@@ -29,10 +29,10 @@ const std::string PluginPrePass[] = {"--init"};
 const std::string PluginPostPass[] = {"--deinit", "--mlir-print-debuginfo"};
 
 int main(int argc, char **argv) {
-  tbc::registerAllPasses();
 
   DialectRegistry registry;
   tbc::registerAllDialects(registry);
+  tbc::registerAllPasses();
   if (argc <= 2) {
     return asMainReturnCode(MlirOptMain(
         argc, argv, "TPU MLIR module optimizer driver\n", registry));

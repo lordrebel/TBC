@@ -74,6 +74,27 @@ class OnnxTransformer(ModelTransformer):
         from tools.model_runner import onnx_inference
         return onnx_inference(inputs, self.converter.onnx_file)
 
+class SvJsonTransformer(ModelTransformer):
+
+    def __init__(self,
+                 model_name,
+                 model_path,
+                 mode="F32",
+                 input_shapes: list = [],
+                 output_names: list = [],
+                 without_simplfy=False,
+                 onnx_sim=''):
+        super().__init__(model_name, model_path,without_simplfy)
+        from transform.SVjsonConverter import SvJsonConverter
+        self.converter = SvJsonConverter(self.model_name,
+                                       self.model_path,
+                                       mode,
+                                       input_shapes,
+                                       output_names)
+
+    def origin_inference(self, inputs: dict):
+        raise NotImplementedError("SVJsonTransformer does not support origin inference directly. ")
+
 
 class TorchTransformer(ModelTransformer):
 
@@ -113,6 +134,10 @@ def get_model_transform(args):
     elif args.platform == "torch":
         tool = TorchTransformer(args.model_name, args.model_path, args.mode,args.input_shapes,
                                 args.input_types, args.output_names,args.without_simplfy)
+    elif args.platform == "svjson":
+        tool = SvJsonTransformer(args.model_name, args.model_path, args.mode,args.input_shapes,
+                                 args.output_names, args.without_simplfy)
+
     else:
         # TODO: support more deep learning model types
         raise RuntimeError("unsupport model:{}".format(args.model_path))
@@ -125,7 +150,7 @@ if __name__ == '__main__':
     # yapf: disable
     parser.add_argument("--model_name", required=True, help="model name")
     parser.add_argument("--model_path", required=True, help="model definition file.")
-    parser.add_argument("--platform", type=str, required=True,choices=["onnx", "torch"],
+    parser.add_argument("--platform", type=str, required=True,choices=["onnx", "torch","svjson"],
                         help="model platform, like:onnx,torch")
     parser.add_argument("--mode",type=str,default="F32",choices=["INT8","UINT8","INT4","BF16","F16","F32","W8F16","W8BF16","W4F16","W4BF16","F8E4M3","F8E5M2","W4F8E4M3","W4F8E5M2",],
                         help="the precision of model, like:INT8,UINT8,INT4,BF16,F16,F32,W8F16,W8BF16,W4 default is F32")

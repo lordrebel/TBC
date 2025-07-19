@@ -13,6 +13,11 @@ using namespace mlir::func;
 #include "dialects/operators/IR/OperatorsDialect.cpp.inc"
 
 void OperatorDialect::initialize() {
+
+  auto *context = getContext();
+  context->getOrLoadDialect<mlir::pdl::PDLDialect>();
+  context->getOrLoadDialect<mlir::pdl_interp::PDLInterpDialect>();
+  
   addAttributes<
 #define GET_ATTRDEF_LIST
 #include "dialects/operators/IR/operatorAttr.cpp.inc"

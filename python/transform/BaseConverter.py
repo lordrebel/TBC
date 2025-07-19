@@ -23,7 +23,9 @@ class BaseConverter(object):
         raise NotImplementedError('generate_mlir')
 
     def addValueInfo(self, name, shape, dtype="F32"):
-        if len(shape) == 0:
+        if shape is None:
+            shape = []
+        elif len(shape) == 0:
             shape = [1]
         if isinstance(shape, tuple):
             shape = list(shape)
