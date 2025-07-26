@@ -16,6 +16,7 @@ if(CCACHE)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE})
 endif()
 option(ENABLE_TBC_PYTHON_EXTRA "Enable Python bindings for pdl dialects" ON)
+option(BUILD_DOC "build documents" ON)
 
 #-------------------------------------------------------------------------------
 # MLIR/LLVM Configuration
@@ -115,3 +116,6 @@ add_subdirectory(3rdparty)
 add_subdirectory(lib)
 add_subdirectory(tools)
 add_subdirectory(python)
+if(BUILD_DOC)
+  add_subdirectory(docs)
+endif()

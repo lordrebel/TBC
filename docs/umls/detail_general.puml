@@ -1,0 +1,126 @@
+@startuml
+!define RECTANGLE class
+
+skinparam stereotypeDisplay none
+
+hide stereotype
+skinparam minClassWidth 100
+skinparam nodesep 20
+skinparam ranksep 5
+'skinparam packageStyle rectangle
+'skinparam linetype ortho
+'skinparam arrowThickness 1
+
+
+skinparam rectangle {
+    BackgroundColor White
+    BorderColor Black
+}
+
+skinparam rectangle<<dialect>> {
+    BackgroundColor Yellow
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<compilephase>> {
+    BackgroundColor Red
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<pass>> {
+    BackgroundColor Green
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<conversion>> {
+    BackgroundColor DarkBlue
+    BorderColor Black
+    FontColor Black
+}
+
+package "LayergroupPass" {
+    () "groupSearch" <<pass>>
+    () "CascadePass" <<pass>>
+    () "hwSchedulePass" <<pass>>
+    () "SRAMMallocPass" <<pass>>
+
+    groupSearch --> CascadePass
+    CascadePass --> hwSchedulePass
+    hwSchedulePass --> SRAMMallocPass
+}
+
+rectangle "operator dialect" as operator <<dialect>>
+rectangle "kernel dialect" as kernel <<dialect>>
+rectangle "hal dialect" as hal <<dialect>>
+rectangle "converter" as converter
+rectangle "model for certain target" as model_for_certain_target
+
+() "model from other platform" as model_from_other_platform
+() "IMPORED" as IMPORTED <<compilephase>>
+() "OPERATOR_OPTED" as OPERATOR_OPTSED <<compilephase>>
+() "KERNEL" as KERNEL <<compilephase>>
+() "KERNEL_OPTED" as KERNEL_OPTED <<compilephase>>
+() "HAL" as HAL <<compilephase>>
+() "HAL_OPTED" as HAL_OPTED <<compilephase>>
+() "HAL_ADDRESSED" as HAL_ADDRESSED <<compilephase>>
+() "CODEGEN" as CODEGEN <<compilephase>>
+
+() "operatorPlatformDependentPass" as operatorPlatformDependentPass <<pass>>
+() "canonicalPass" as canonicalPass <<pass>>
+() "shapeInferencePass" as shapeInferencePass <<pass>>
+() "typeInferencePass" as typeInferencePass <<pass>>
+() "weightFolderPass" as weightFolderPass <<pass>>
+
+
+() "kernelTargetDependentPass" as kernelTargetDependentPass <<pass>>
+() "AssignHardwarePass" as AssignHardwarePass <<pass>>
+() "KernelFusePass" as KernelFusePass <<pass>>
+
+() "LegalizePass" as LegalizePass <<pass>>
+() "HalTargetDependentPass" as HalTargetDependentPass <<pass>>
+' () "LayergroupPass" as LayergroupPass <<pass>>
+() "InsertSyncPass" as InsertSyncPass <<pass>>
+() "weightPackPass" as weightPackPass <<pass>>
+() "AssemblePass" as AssemblePass <<pass>>
+
+() "LoweringToKernel" as LoweringToKernel <<conversion>>
+() "LoweringToHal" as LoweringToHal <<conversion>>
+() "CodegenPass" as CodegenPass <<conversion>>
+
+' 连接关系
+
+model_from_other_platform --> converter: using python
+converter --> operator
+operator -> IMPORTED
+IMPORTED --> operatorPlatformDependentPass
+operatorPlatformDependentPass --> canonicalPass
+canonicalPass --> shapeInferencePass
+shapeInferencePass --> typeInferencePass
+typeInferencePass --> weightFolderPass
+weightFolderPass --> OPERATOR_OPTSED
+OPERATOR_OPTSED --> LoweringToKernel
+LoweringToKernel -left-> kernel :lowering
+kernel -left-> KERNEL
+KERNEL --> kernelTargetDependentPass
+kernelTargetDependentPass --> AssignHardwarePass
+AssignHardwarePass --> KernelFusePass
+KernelFusePass --> KERNEL_OPTED
+KERNEL_OPTED --> LoweringToHal
+LoweringToHal --> hal :lowering
+hal -> HAL
+HAL -> LegalizePass
+LegalizePass --> HalTargetDependentPass
+HalTargetDependentPass --> HAL_OPTED
+HAL_OPTED --> LayergroupPass
+LayergroupPass --> InsertSyncPass
+InsertSyncPass --> HAL_ADDRESSED
+HAL_ADDRESSED --> weightPackPass
+weightPackPass --> AssemblePass
+AssemblePass --> CODEGEN
+CODEGEN -left-> CodegenPass
+CodegenPass --> model_for_certain_target : codegen
+
+@enduml

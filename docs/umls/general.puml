@@ -1,0 +1,35 @@
+@startuml
+!define RECTANGLE class
+
+skinparam stereotypeDisplay none
+hide stereotype
+
+skinparam rectangle {
+    BackgroundColor White
+    BorderColor Black
+}
+
+skinparam rectangle<<dialect>> {
+    BackgroundColor Yellow
+    BorderColor Black
+    FontColor Black
+}
+
+
+rectangle "operator dialect" as operator <<dialect>>
+rectangle "kernel dialect" as kernel <<dialect>>
+rectangle "hal dialect" as hal <<dialect>>
+rectangle "converter" as converter
+rectangle "model for certain target" as model_for_certain_target
+() "model from other platform" as model_from_other_platform
+
+
+' 连接关系
+
+model_from_other_platform --> converter: using python
+converter --> operator
+operator --> kernel : lowering
+kernel --> hal : lowering
+hal -->  model_for_certain_target : codegen
+
+@enduml

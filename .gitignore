@@ -4,3 +4,5 @@ install/**
 .vscode/**
 **/__pycache__/**
 __pycache__/**
+*.docx
+**/docs/umls/*.png
