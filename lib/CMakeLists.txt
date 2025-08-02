@@ -18,5 +18,7 @@ add_mlir_library(TBCInitAll
   MLIRFuncDialect
 
   TBCOperators
+  TBCKernels
+  TBCHals
 )
 

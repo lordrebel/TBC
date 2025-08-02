@@ -53,7 +53,7 @@ def CompareModeAttr: AnyStrAttrOf<["Equal","Greater","GreaterOrEqual","Less","Le
 def ReduceModeAttr: AnyStrAttrOf<["ReduceMin","ReduceMax","ReduceMean","ReduceL2","ReduceL1","ReduceSum","ReduceProd"]>;
 def InterpModeAttr: AnyStrAttrOf<["nearest","linear"]>;
 def InterpCoordModeAttr: AnyStrAttrOf<["align_corners", "half_pixel", "pytorch_half_pixel", "asymmetric"]>;
-def LayoutFormatAttr: AnyStrAttrOf<["nhwc","nchw","npufmt"]>;
+def LayoutFormatAttr: AnyStrAttrOf<["nhwc","nchw","npufmt","nhwc_sparse","stream"]>;
 def DetectionOutputCodeTypeAttr: AnyStrAttrOf<["CORNER", "CENTER_SIZE", "CORNER_SIZE"]>;
 def NonZeroOrderAttr: AnyStrAttrOf<["ColMajor","RowMajor"]>;
 def AutoPadModeAttr:AnyStrAttrOf<["SAME_UPPER","SAME_LOWER","NOTSET","VALID"]>;

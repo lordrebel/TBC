@@ -1,4 +1,6 @@
 #include "initAll.h"
+#include "dialects/hals/IR/hals.h"
+#include "dialects/kernels/IR/kernels.h"
 #include "dialects/operators/IR/operator.h"
 #include "dialects/operators/transforms/pass.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
@@ -11,7 +13,8 @@ namespace tbc {
 void registerAllDialects(mlir::DialectRegistry &registry) {
   registry.insert<mlir::func::FuncDialect, mlir::pdl::PDLDialect,
                   mlir::pdl_interp::PDLInterpDialect,
-                  mlir::transform::TransformDialect, ops::OperatorDialect>();
+                  mlir::transform::TransformDialect, 
+                  ops::OperatorDialect,kls::KernelDialect,hals::HalDialect>();
 }
 
 void registerAllPasses() {

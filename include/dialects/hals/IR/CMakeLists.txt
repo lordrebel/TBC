@@ -1,0 +1,11 @@
+add_mlir_dialect(Hals hals)
+#add_mlir_doc(TpuOps TpuOps ./ -gen-op-doc)
+
+set(LLVM_TARGET_DEFINITIONS hals.td)
+mlir_tablegen(HalEnum.h.inc -gen-enum-decls)
+mlir_tablegen(HalEnum.cpp.inc -gen-enum-defs)
+mlir_tablegen(HalAttr.h.inc -gen-attrdef-decls)
+mlir_tablegen(HalAttr.cpp.inc -gen-attrdef-defs)
+mlir_tablegen(HalTypes.h.inc -gen-typedef-decls)
+mlir_tablegen(HalTypes.cpp.inc -gen-typedef-defs)
+add_public_tablegen_target(MLIRHalAttrGen)
