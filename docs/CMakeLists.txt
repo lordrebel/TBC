@@ -18,3 +18,11 @@ add_custom_target(generate_docs ALL
 )
 
 add_dependencies(generate_docs install_pandoc)
+
+install(FILES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/design.docx
+    ${CMAKE_CURRENT_SOURCE_DIR}/dev.docx
+    DESTINATION doc
+    COMPONENT documentation
+    OPTIONAL  # 如果文件不存在也不报错
+)
