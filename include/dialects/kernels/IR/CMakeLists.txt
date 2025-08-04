@@ -1,7 +1,7 @@
 add_mlir_dialect(Kernels kernels)
 #add_mlir_doc(TpuOps TpuOps ./ -gen-op-doc)
 
-set(LLVM_TARGET_DEFINITIONS kernels.td)
+set(LLVM_TARGET_DEFINITIONS Kernels.td)
 mlir_tablegen(KernelEnum.h.inc -gen-enum-decls)
 mlir_tablegen(KernelEnum.cpp.inc -gen-enum-defs)
 mlir_tablegen(KernelAttr.h.inc -gen-attrdef-decls)
