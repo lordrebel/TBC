@@ -1,6 +1,6 @@
 add_custom_command(
     OUTPUT ${CMAKE_SOURCE_DIR}/3rdparty/docgen/tools/pandoc/bin/pandoc
-    COMMAND ${CMAKE_SOURCE_DIR}/3rdparty/docgen/tools/install_pandoc.sh
+    COMMAND bash ${CMAKE_SOURCE_DIR}/3rdparty/docgen/tools/install_pandoc.sh
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/3rdparty/docgen/tools
     COMMENT "installing pandoc..."
     VERBATIM
