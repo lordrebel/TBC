@@ -30,9 +30,9 @@ class Hal_Attr<string attrName, string attrMnemonic, list<Trait> traits = []>
 // A string attribute whose value are one of the values in `cases`.
 class AnyStrAttrOf<list<string> cases> : StringBasedAttr<
   CPred<!foldl(
-      "$_self.cast<StringAttr>().getValue() == \"" # !head(cases) # "\"",
+      "mlir::cast<StringAttr>($_self).getValue() == \"" # !head(cases) # "\"",
       !foreach(case, !tail(cases),
-               "$_self.cast<StringAttr>().getValue() == \"" # case # "\""),
+               "mlir::cast<StringAttr>($_self).getValue() == \"" # case # "\""),
       prev, cur, prev # " || " # cur)>,
   "string attribute whose value is " #
     !foldl(/*init*/!head(cases), /*list*/!tail(cases),
@@ -75,6 +75,16 @@ def Hal_TensorKind : I32EnumAttr<"TensorKind", "HAL tensor kind", [
 }
 
 def Hal_TensorKindAttr : EnumAttr<Hal_Dialect, Hal_TensorKind, "Tensor_Kind">;
+
+def Hal_LutAttr : Hal_Attr<"LutAttr", "lutattr"> {
+  let summary = "Structure of layer group parameters";
+  let parameters = (ins
+    "int32_t":$sig,
+    "int32_t":$bin,
+    "int32_t":$cal
+  );
+  let assemblyFormat = "`<` struct(params) `>`";
+}
 //===----------------------------------------------------------------------===//
 // Hals Types.
 //===----------------------------------------------------------------------===//
@@ -86,9 +96,9 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
     A custom tensor type for HAL dialect that includes memory space,
     storage layout, and other hardware-specific information.
   }];
-  
+  //shape try to use ArrayRefParameter!!!
   let parameters = (ins
-    "mlir::DenseI64ArrayAttr":$shape,
+    ArrayRefParameter<"int64_t">:$shape,
     "mlir::Type":$elementType,
     DefaultValuedParameter<"MemorySpace", "MemorySpace::NOT_SET">:$memorySpace,
     DefaultValuedParameter<"StorageLayout", "StorageLayout::nchw">:$layout,
@@ -100,22 +110,15 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
   let assemblyFormat = "`<` $shape `x` $elementType `,` $memorySpace `,` $layout `,` $addr `,` $kind `>`";
   
   let builders = [
-    TypeBuilder<(ins "llvm::ArrayRef<int64_t>":$shape,
-                     "mlir::Type":$elementType,
-                     "MemorySpace":$memorySpace,
-                     "StorageLayout":$layout,
-                     "int64_t":$addr,
-                     "TensorKind":$kind), [{
-      return $_get($_ctxt, mlir::DenseI64ArrayAttr::get($_ctxt,shape), elementType, memorySpace, layout, addr,kind);
-    }]>,
+
     TypeBuilder<(ins "llvm::ArrayRef<int64_t>":$shape,
                      "mlir::Type":$elementType,
                      "MemorySpace":$memorySpace), [{
-      return $_get($_ctxt, mlir::DenseI64ArrayAttr::get($_ctxt,shape), elementType, memorySpace, StorageLayout::nchw,
+      return $_get($_ctxt, shape, elementType, memorySpace, StorageLayout::nchw,
                    /*addr=*/-1, TensorKind::NOT_SET); 
     }]>,
      TypeBuilder<(ins "mlir::TensorType":$ori_tensor), [{
-      return $_get($_ctxt,  mlir::DenseI64ArrayAttr::get($_ctxt,ori_tensor.getShape()), ori_tensor.getElementType(), MemorySpace::NOT_SET, StorageLayout::nchw,
+      return $_get($_ctxt,  ori_tensor.getShape(), ori_tensor.getElementType(), MemorySpace::NOT_SET, StorageLayout::nchw,
                    /*addr=*/-1, TensorKind::NOT_SET); 
     }]>
    ];
@@ -123,7 +126,7 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
   let extraClassDeclaration = [{
     int64_t getNumElements() const {
       int64_t num = 1;
-      for (auto dim : getShapeVals()) {
+      for (auto dim : getShape()) {
         if (dim < 0) return -1; // 动态维度
         num *= dim;
       }
@@ -148,24 +151,26 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
     
     int64_t getMemorySize() const;
 
-    llvm::ArrayRef<int64_t> getShapeVals() const {
-      return llvm::ArrayRef<int64_t>(getShape().asArrayRef());
-    }
     int64_t getRank() const {
-      return getShapeVals().size();
+      return getShape().size();
     }
     
   }];
 }
 
 // 定义 HalTensor 的类型约束
-def AnyHalTensor : Type<CPred<"$_self.isa<::tbc::hals::HalTensorType>()">, 
+def AnyHalTensor : Type<CPred<"mlir::isa<::tbc::hals::HalTensorType>($_self)">, 
                         "HAL tensor", "::tbc::hals::HalTensorType">;
 
 // 定义任意排名的 HalTensor（类似 AnyRankedTensor）
-def AnyRankedHalTensor : Type<CPred<"$_self.isa<::tbc::hals::HalTensorType>() && "
-                                   "$_self.cast<::tbc::hals::HalTensorType>().getRank() >= 0">, 
+def AnyRankedHalTensor : Type<CPred<"mlir::isa<::tbc::hals::HalTensorType>($_self) && "
+                                   "mlir::cast<::tbc::hals::HalTensorType>().getRank() >= 0">, 
                              "ranked HAL tensor", "::tbc::hals::HalTensorType">;
+
+def WeightHalTensor : Type<CPred<"mlir::isa<::tbc::hals::HalTensorType>($_self) && "
+                                   "mlir::cast<::tbc::hals::HalTensorType>($_self).IsTensorKindSetted() && "
+                                   "mlir::cast<::tbc::hals::HalTensorType>($_self).getKind() == ::tbc::hals::HalTensorKind::WEIGHT">, 
+                             "weight HAL tensor", "::tbc::hals::HalTensorType">;
 
 def AnyHalTensorOrNone: AnyTypeOf<[AnyRankedHalTensor, NoneType]>;
 
@@ -180,5 +185,20 @@ class Hal_Op<string mnemonic, list<Trait> traits = []> :
     Op<Hal_Dialect, mnemonic, !listconcat(traits,
        [])> ;
 
+def Kernel_LutOp : Hal_Op<"Lut"> {
+  let summary = "lut operator";
+  let description = [{
+    result = lut_y[i] + lut_k[i] * (x - lut_x[i])
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input,
+    AnyHalTensor:$lut_x,
+    AnyHalTensor:$lut_y,
+    AnyHalTensor:$lut_k,
+    Hal_LutAttr:$lut_attr
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyTensor:$output);
+}
 
 #endif

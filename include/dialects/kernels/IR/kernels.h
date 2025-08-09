@@ -8,9 +8,11 @@
 #include "mlir/IR/DialectImplementation.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
+#include "interfaces/externalExe_interface.h"
 
 #include "traits/traits.h"
 #include"support/utils.h"
+#include "support/log.h"
 
 #include "dialects/kernels/IR/KernelEnum.h.inc"
 #include "dialects/kernels/IR/KernelsDialect.h.inc"

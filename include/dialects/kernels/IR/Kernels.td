@@ -4,7 +4,7 @@ include "mlir/IR/AttrTypeBase.td"
 include "mlir/IR/OpBase.td"
 include "mlir/IR/EnumAttr.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
-include "interfaces/ExternalExecuteInterface.td"
+include "interfaces/ExternalExeInterface.td"
 
 // =============================================================================
 //
@@ -31,18 +31,19 @@ class Kernel_Attr<string attrName, string attrMnemonic, list<Trait> traits = []>
 // A string attribute whose value are one of the values in `cases`.
 class AnyStrAttrOf<list<string> cases> : StringBasedAttr<
   CPred<!foldl(
-      "$_self.cast<StringAttr>().getValue() == \"" # !head(cases) # "\"",
+      "mlir::cast<StringAttr>($_self).getValue() == \"" # !head(cases) # "\"",
       !foreach(case, !tail(cases),
-               "$_self.cast<StringAttr>().getValue() == \"" # case # "\""),
+               "mlir::cast<StringAttr>($_self).getValue() == \"" # case # "\""),
       prev, cur, prev # " || " # cur)>,
   "string attribute whose value is " #
     !foldl(/*init*/!head(cases), /*list*/!tail(cases),
            prev, cur, prev # ", or " # cur)>;
 
-def ArgModeAttr: AnyStrAttrOf<["ArgMin","ArgMax"]>;
 def CompareModeAttr: AnyStrAttrOf<["Equal","Greater","GreaterOrEqual","Less","LessOrEqual", "NotEqual", "Not", "And"]>;
-def ReduceModeAttr: AnyStrAttrOf<["ReduceMin","ReduceMax","ReduceMean","ReduceL2","ReduceL1","ReduceSum","ReduceProd"]>;
-def RoiAlignModeAttr: AnyStrAttrOf<["Avg","Max"]>;
+def EltwiseModeAttr: AnyStrAttrOf<["Add","Sub","Mul","Div"]>;
+def ReduceModeAttr: AnyStrAttrOf<["ReduceMin","ReduceMax","ReduceMean","ReduceSum","ReduceProd"]>;
+def ReduceOutTypeAttr: AnyStrAttrOf<["IDX","VAL"]>;
+
 def Kernel_PaddingMode: I32EnumAttr<"PaddingMode",
     "requant mode supported by PadOp",
     [
@@ -123,6 +124,16 @@ def Kernel_ResizeMode : I32EnumAttr<"ResizeMode",
 }
 def Kernel_ResizeModeAttr : EnumAttr<Kernel_Dialect, Kernel_ResizeMode, "mode">;
 
+def Kernel_LutAttr : Kernel_Attr<"LutAttr", "lutattr"> {
+  let summary = "Structure of layer group parameters";
+  let parameters = (ins
+    "int32_t":$sig,
+    "int32_t":$bin,
+    "int32_t":$cal
+  );
+  let assemblyFormat = "`<` struct(params) `>`";
+}
+
 //===----------------------------------------------------------------------===//
 // Kernel Types.
 //===----------------------------------------------------------------------===//
@@ -141,5 +152,129 @@ class Kernel_Op<string mnemonic, list<Trait> traits = []> :
        [
         DeclareOpInterfaceMethods<ExecuteOnNPU>,
        ])> ;
+
+def Kernel_ActiveOp: Kernel_Op<"Active",[]>{
+  let summary = "Active operator";
+
+  let description = [{
+     The operator for activation function
+  }];
+
+  let arguments = (ins
+    AnyRankedTensor:$input,
+    Kernel_ActiveModeAttr:$mode
+  );
+
+  let results = (outs AnyRankedTensor:$output);
+  let extraClassDeclaration = [{
+  }];
+}
+def Kernel_CompareOp: Kernel_Op<"Compare",[]>{
+  let summary = "Compare operator";
+
+  let description = [{
+     The operator for compare function
+  }];
+
+  let arguments = (ins
+    AnyRankedTensor:$input,
+    AnyTensorOrNone:$right,
+    CompareModeAttr:$mode
+  );
+
+  let results = (outs AnyRankedTensor:$output);
+  let hasVerifier = 1;
+  let extraClassDeclaration = [{
+  }];
+}
+
+def Kernel_CompareConstOp: Kernel_Op<"CompareConst",[]>{
+  let summary = "Compare operator";
+
+  let description = [{
+     The operator for compare function
+  }];
+
+  let arguments = (ins
+    AnyRankedTensor:$input,
+    F64Attr:$right,
+    CompareModeAttr:$mode
+  );
+
+  let results = (outs AnyRankedTensor:$output);
+  let hasVerifier = 1;
+  let extraClassDeclaration = [{
+  }];
+}
+
+def Kernel_EltWiseOp: Kernel_Op<"Eltwise",[]>{
+  let summary = "Eltwise operator";
+
+  let description = [{
+     The operator for compare function
+  }];
+
+  let arguments = (ins
+    AnyRankedTensor:$input,
+    AnyRankedTensor:$right,
+    EltwiseModeAttr:$mode
+  );
+
+  let results = (outs AnyRankedTensor:$output);
+  let extraClassDeclaration = [{
+  }];
+}
+
+def Kernel_EltWiseConstOp: Kernel_Op<"EltwiseConst",[]>{
+  let summary = "Eltwise operator";
+
+  let description = [{
+     The operator for compare function
+  }];
+
+  let arguments = (ins
+    AnyRankedTensor:$input,
+    F64Attr:$right,
+    EltwiseModeAttr:$mode
+  );
+
+  let results = (outs AnyRankedTensor:$output);
+  let extraClassDeclaration = [{
+  }];
+}
+
+def Kernel_LutOp : Kernel_Op<"Lut"> {
+  let summary = "lut operator";
+  let description = [{
+    result = lut_y[i] + lut_k[i] * (x - lut_x[i])
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    AnyTensor:$lut_x,
+    AnyTensor:$lut_y,
+    AnyTensor:$lut_k,
+    Kernel_LutAttr:$lut_attr
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyTensor:$output);
+}
+def Kernel_ReduceOp : Kernel_Op<"Reduce"> {
+  let summary = "Reduce operation";
+  let description = [{
+    Computes the mean/max/prod/sum of the input tensor's element along the provided axes.
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    I64ArrayAttr:$axes,
+    BoolAttr:$keepdims,
+    ReduceModeAttr:$mode,
+    DefaultValuedAttr<ReduceOutTypeAttr,"\"VAL\"">:$out_type
+  );
+  let results = (outs AnyTensor:$output);
+  let hasCanonicalizer = 0;
+  let hasVerifier = 1;
+}
+
+
 
 #endif

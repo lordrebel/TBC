@@ -12,11 +12,14 @@
 
 #include "traits/traits.h"
 #include"support/utils.h"
+#include "support/log.h"
+
 #include "dialects/hals/IR/HalEnum.h.inc"
 #include "dialects/hals/IR/HalsDialect.h.inc"
 #define GET_ATTRDEF_CLASSES
 #include "dialects/hals/IR/HalAttr.h.inc"
-#define GET_OP_CLASSES
-#include "dialects/hals/IR/Hals.h.inc"
 #define GET_TYPEDEF_CLASSES
 #include "dialects/hals/IR/HalTypes.h.inc"
+#define GET_OP_CLASSES
+#include "dialects/hals/IR/Hals.h.inc"
+

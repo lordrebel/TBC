@@ -14,6 +14,7 @@
 
 #include "traits/traits.h"
 #include"support/utils.h"
+#include "support/log.h"
 
 #include "dialects/operators/IR/OperatorsDialect.h.inc"
 #define GET_ATTRDEF_CLASSES
