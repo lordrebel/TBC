@@ -39,7 +39,7 @@ class AnyStrAttrOf<list<string> cases> : StringBasedAttr<
     !foldl(/*init*/!head(cases), /*list*/!tail(cases),
            prev, cur, prev # ", or " # cur)>;
 
-def CompareModeAttr: AnyStrAttrOf<["Equal","Greater","GreaterOrEqual","Less","LessOrEqual", "NotEqual", "Not", "And"]>;
+def CompareModeAttr: AnyStrAttrOf<["Equal","Greater","GreaterOrEqual","Less","LessOrEqual", "NotEqual", "Not", "And", "Or"]>;
 def EltwiseModeAttr: AnyStrAttrOf<["Add","Sub","Mul","Div"]>;
 def ReduceModeAttr: AnyStrAttrOf<["ReduceMin","ReduceMax","ReduceMean","ReduceSum","ReduceProd"]>;
 def ReduceOutTypeAttr: AnyStrAttrOf<["IDX","VAL"]>;

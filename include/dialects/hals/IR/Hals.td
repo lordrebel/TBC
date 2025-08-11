@@ -38,8 +38,55 @@ class AnyStrAttrOf<list<string> cases> : StringBasedAttr<
     !foldl(/*init*/!head(cases), /*list*/!tail(cases),
            prev, cur, prev # ", or " # cur)>;
 
+def HaL_CompareMode :I32EnumAttr<"CompareMode", "HAL compare mode", [
+  I32EnumAttrCase<"Equal", 0, "equal">,
+  I32EnumAttrCase<"Greater", 1, "Greater">,
+  I32EnumAttrCase<"Less", 2, "Less">,
+  I32EnumAttrCase<"LessOrEqual", 3, "LessOrEqual">,
+  I32EnumAttrCase<"NotEqual", 4, "NotEqual">,
+  I32EnumAttrCase<"Not", 5, "not">,
+  I32EnumAttrCase<"And", 6, "and">,
+  I32EnumAttrCase<"Or", 7, "or">,
+  ]> {
+  let cppNamespace = "::tbc::hals";
+  let genSpecializedAttr = 0;
+}
+def Hal_CompareModeAttr : EnumAttr<Hal_Dialect, HaL_CompareMode, "CompareOpMode" >;
+
+def Hal_EltwiseMode : I32EnumAttr<"EltwiseMode", "HAL eltwise mode", [
+  I32EnumAttrCase<"Add", 0, "add">,
+  I32EnumAttrCase<"Sub", 1, "sub">,
+  I32EnumAttrCase<"Mul", 2, "mul">,
+  I32EnumAttrCase<"Div", 3, "div">,
+  ]> {
+  let cppNamespace = "::tbc::hals";
+  let genSpecializedAttr = 0;
+}
+def Hal_EltwiseModeAttr : EnumAttr<Hal_Dialect, Hal_EltwiseMode, "Eltwise_Mode">;
+
+def Hal_ReduceMode : I32EnumAttr<"ReduceMode", "HAL reduce mode", [
+  I32EnumAttrCase<"ReduceMin", 0, "reduce_min">,
+  I32EnumAttrCase<"ReduceMax", 1, "reduce_max">,
+  I32EnumAttrCase<"ReduceMean", 2, "reduce_mean">,
+  I32EnumAttrCase<"ReduceSum", 3, "reduce_sum">,
+  I32EnumAttrCase<"ReduceProd", 4, "reduce_prod">,
+  ]> {
+  let cppNamespace = "::tbc::hals";
+  let genSpecializedAttr = 0;
+}
+def Hal_ReduceModeAttr : EnumAttr<Hal_Dialect, Hal_ReduceMode, "Reduce_Mode">;
+
+def Hal_ReduceOutType : I32EnumAttr<"ReduceOutType", "HAL reduce output type", [
+  I32EnumAttrCase<"IDX", 0, "index">,
+  I32EnumAttrCase<"VAL", 1, "value">,
+]> {
+  let cppNamespace = "::tbc::hals";
+  let genSpecializedAttr = 0;
+}
+def Hal_ReduceOutTypeAttr : EnumAttr<Hal_Dialect, Hal_ReduceOutType, "Reduce_Output_Type">;
+
 def Hal_MemorySpace : I32EnumAttr<"MemorySpace", "HAL memory space", [
-   I32EnumAttrCase<"NOT_SET", 0, "not set">,
+  I32EnumAttrCase<"NOT_SET", 0, "not set">,
   I32EnumAttrCase<"DDR", 1, "ddr">,
   I32EnumAttrCase<"L2", 2, "l2">,
   I32EnumAttrCase<"L1", 3, "l1">,
@@ -185,7 +232,20 @@ class Hal_Op<string mnemonic, list<Trait> traits = []> :
     Op<Hal_Dialect, mnemonic, !listconcat(traits,
        [])> ;
 
-def Kernel_LutOp : Hal_Op<"Lut"> {
+def Hal_EltwiseOp: Hal_Op<"Eltwise"> {
+  let summary = "element-wise operator";
+  let description = [{
+    result = op1[i] op op2[i]
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input1,
+    AnyHalTensor:$input2,
+    Hal_EltwiseModeAttr:$opType
+  );
+  let hasCanonicalizer = 0;
+}
+
+def Hal_LutOp : Hal_Op<"Lut"> {
   let summary = "lut operator";
   let description = [{
     result = lut_y[i] + lut_k[i] * (x - lut_x[i])
@@ -196,6 +256,21 @@ def Kernel_LutOp : Hal_Op<"Lut"> {
     AnyHalTensor:$lut_y,
     AnyHalTensor:$lut_k,
     Hal_LutAttr:$lut_attr
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyTensor:$output);
+}
+
+def Hal_ScaleOp : Hal_Op<"Scale"> {
+  let summary = "scale operator";
+  let description = [{
+    res=input * scale+ bias
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input,
+    AnyHalTensor:$scale,
+    AnyHalTensor:$bias,
+    DefaultValuedAttr<BoolAttr, "false">:$negative_bias
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyTensor:$output);
