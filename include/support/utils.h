@@ -109,6 +109,7 @@ typedef struct {
   int64_t pad_w;
   int64_t pad_w_after;
   int64_t pad_value;
+  bool do_relu;
   double relu_limit;
   bool is_global;
   bool count_include_pad;

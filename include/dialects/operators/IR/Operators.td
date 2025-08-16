@@ -51,7 +51,7 @@ class AnyStrAttrOf<list<string> cases> : StringBasedAttr<
 def ArgModeAttr: AnyStrAttrOf<["ArgMin","ArgMax"]>;
 def CompareModeAttr: AnyStrAttrOf<["Equal","Greater","GreaterOrEqual","Less","LessOrEqual", "NotEqual", "And", "Not"]>;
 def ReduceModeAttr: AnyStrAttrOf<["ReduceMin","ReduceMax","ReduceMean","ReduceL2","ReduceL1","ReduceSum","ReduceProd"]>;
-def InterpModeAttr: AnyStrAttrOf<["nearest","linear"]>;
+def InterpModeAttr: AnyStrAttrOf<["zero","nearest","linear","bilinear"]>;
 def InterpCoordModeAttr: AnyStrAttrOf<["align_corners", "half_pixel", "pytorch_half_pixel", "asymmetric"]>;
 def LayoutFormatAttr: AnyStrAttrOf<["nhwc","nchw","npufmt","nhwc_sparse","stream"]>;
 def DetectionOutputCodeTypeAttr: AnyStrAttrOf<["CORNER", "CENTER_SIZE", "CORNER_SIZE"]>;

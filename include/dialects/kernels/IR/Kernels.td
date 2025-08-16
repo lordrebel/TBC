@@ -47,10 +47,11 @@ def ReduceOutTypeAttr: AnyStrAttrOf<["IDX","VAL"]>;
 def Kernel_PaddingMode: I32EnumAttr<"PaddingMode",
     "requant mode supported by PadOp",
     [
-      I32EnumAttrCase<"constant", 0>,
-      I32EnumAttrCase<"reflect", 1>,
-      I32EnumAttrCase<"symmetric", 2>,
+      I32EnumAttrCase<"no_pad", 0>,
+      I32EnumAttrCase<"constant", 1>,
+      I32EnumAttrCase<"reflect", 2>,
       I32EnumAttrCase<"edge", 3>,
+      I32EnumAttrCase<"symmetric", 4>,
     ]>{
   let genSpecializedAttr = 0;
   let cppNamespace = "::tbc::kls";
@@ -116,8 +117,10 @@ def Kernel_ActiveModeAttr : EnumAttr<Kernel_Dialect, Kernel_ActiveMode, "active_
 def Kernel_ResizeMode : I32EnumAttr<"ResizeMode",
     "Resize mode",
     [
-      I32EnumAttrCase<"nearest", 0>,
-      I32EnumAttrCase<"linear", 1>,
+      I32EnumAttrCase<"zero", 0>,
+      I32EnumAttrCase<"nearest", 1>,
+      I32EnumAttrCase<"linear", 2>,
+      I32EnumAttrCase<"bilinear", 3>,
     ]>{
   let genSpecializedAttr = 0;
   let cppNamespace = "::tbc::kls";
@@ -169,6 +172,7 @@ def Kernel_ActiveOp: Kernel_Op<"Active",[]>{
   let extraClassDeclaration = [{
   }];
 }
+
 def Kernel_CompareOp: Kernel_Op<"Compare",[]>{
   let summary = "Compare operator";
 
@@ -179,7 +183,9 @@ def Kernel_CompareOp: Kernel_Op<"Compare",[]>{
   let arguments = (ins
     AnyRankedTensor:$input,
     AnyTensorOrNone:$right,
-    CompareModeAttr:$mode
+    CompareModeAttr:$mode,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
 
   let results = (outs AnyRankedTensor:$output);
@@ -198,13 +204,33 @@ def Kernel_CompareConstOp: Kernel_Op<"CompareConst",[]>{
   let arguments = (ins
     AnyRankedTensor:$input,
     F64Attr:$right,
-    CompareModeAttr:$mode
+    CompareModeAttr:$mode,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
 
   let results = (outs AnyRankedTensor:$output);
   let hasVerifier = 1;
   let extraClassDeclaration = [{
   }];
+}
+
+def Kernel_ConcatOp: Kernel_Op<"Concat",[]>{
+  let summary = "concat operator";
+
+  let description = [{
+     The operator for compare function
+  }];
+
+  let arguments = (ins
+    Variadic<AnyRankedTensor>:$inputs,
+    I64Attr:$axis,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+
+  let results = (outs AnyRankedTensor:$output);
+  let hasVerifier = 0;
 }
 
 def Kernel_EltWiseOp: Kernel_Op<"Eltwise",[]>{
@@ -217,7 +243,9 @@ def Kernel_EltWiseOp: Kernel_Op<"Eltwise",[]>{
   let arguments = (ins
     AnyRankedTensor:$input,
     AnyRankedTensor:$right,
-    EltwiseModeAttr:$mode
+    EltwiseModeAttr:$mode,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
 
   let results = (outs AnyRankedTensor:$output);
@@ -235,12 +263,31 @@ def Kernel_EltWiseConstOp: Kernel_Op<"EltwiseConst",[]>{
   let arguments = (ins
     AnyRankedTensor:$input,
     F64Attr:$right,
-    EltwiseModeAttr:$mode
+    EltwiseModeAttr:$mode,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
 
   let results = (outs AnyRankedTensor:$output);
   let extraClassDeclaration = [{
   }];
+}
+
+def Kernel_InterpOp : Kernel_Op<"Interp"> {
+  let summary = "iterp operator";
+  let description = [{
+      upsample the input tensor to
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    Kernel_ResizeModeAttr:$mode,
+    DefaultValuedAttr<BoolAttr, "false">:$do_activation,
+    DefaultValuedAttr<Kernel_ActiveModeAttr, "tbc::kls::ActiveMode::RELU">:$activation_mode,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyTensor:$output);
 }
 
 def Kernel_LutOp : Kernel_Op<"Lut"> {
@@ -253,11 +300,87 @@ def Kernel_LutOp : Kernel_Op<"Lut"> {
     AnyTensor:$lut_x,
     AnyTensor:$lut_y,
     AnyTensor:$lut_k,
-    Kernel_LutAttr:$lut_attr
+    Kernel_LutAttr:$lut_attr,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyTensor:$output);
 }
+
+def Kernel_PadOp : Kernel_Op<"Pad"> {
+  let summary = "pad operator";
+  let description = [{
+   This operation pads a tensor according to the paddings you specify.
+    paddings is an integer tensor with shape [2, n], where n is the rank of tensor.
+    For each dimension D of input, paddings[0, D] indicates how many values to add
+    before the contents of tensor in that dimension, and paddings[1, D] indicates
+    how many values to add after the contents of tensor in that dimension.
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    I64ArrayAttr:$paddings,
+    DefaultValuedAttr<F64Attr, "0.0">:$val,
+    DefaultValuedAttr<Kernel_PaddingModeAttr, "tbc::kls::PaddingMode::constant">:$mode,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyTensor:$output);
+}
+
+def Kernel_PermuteOp : Kernel_Op<"Permute"> {
+  let summary = "permute operator";
+  let description = [{
+    This operation permutes the dimensions of a tensor according to the specified order.
+    The order is an array of integers that specifies the new order of the dimensions.
+    For example, if the input tensor has shape [2, 3, 4] and the order is [2, 0, 1],
+    the output tensor will have shape [4, 2, 3].
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    I64ArrayAttr:$order,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+  let extraClassDeclaration = [{
+    tbc::utils::permute_attr_t parseParam();
+  }];
+  let hasCanonicalizer = 0;
+  let hasVerifier = 0;
+  let results = (outs AnyTensor:$output);
+}
+
+class Kernel_PoolOp<string mnemonic, list<Trait> traits = []> : Kernel_Op<mnemonic,
+  !listconcat(traits, [])>{
+  let summary = "pool operator";
+  let description = [{
+    This operation performs pooling on the input tensor.
+    The pooling operation can be either average or max pooling.
+    The kernel size and stride can be specified to control the pooling operation.
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    I64ArrayAttr:$kernel_shape,
+    I64ArrayAttr:$strides,
+    I64ArrayAttr:$pads,
+    Kernel_PoolModeAttr:$pool_mode,
+    DefaultValuedAttr<Kernel_PaddingModeAttr,"tbc::kls::PaddingMode::no_pad">:$pad_mode,
+    DefaultValuedAttr<I64Attr, "0">:$pad_value,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+  let hasCanonicalizer = 0;
+  let hasVerifier = 0;
+  let extraClassDeclaration = [{
+    tbc::utils::pool_attr_t parseParam();
+  }];
+  let results = (outs AnyTensor:$output);
+}
+
+def Kernel_Pool1DOp:Kernel_PoolOp<"Pool1D">;
+def Kernel_Pool2DOp:Kernel_PoolOp<"Pool2D">;
+
 def Kernel_ReduceOp : Kernel_Op<"Reduce"> {
   let summary = "Reduce operation";
   let description = [{
@@ -268,11 +391,39 @@ def Kernel_ReduceOp : Kernel_Op<"Reduce"> {
     I64ArrayAttr:$axes,
     BoolAttr:$keepdims,
     ReduceModeAttr:$mode,
-    DefaultValuedAttr<ReduceOutTypeAttr,"\"VAL\"">:$out_type
+    DefaultValuedAttr<ReduceOutTypeAttr,"\"VAL\"">:$out_type,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
   let results = (outs AnyTensor:$output);
   let hasCanonicalizer = 0;
   let hasVerifier = 1;
+}
+
+def Kernel_SliceOp : Kernel_Op<"Slice"> {
+  let summary = "Slice operation";
+  let description = [{
+    Extracts a slice from the input tensor according to the specified start and end indices.
+    The slice is defined by the start and end indices for each dimension.
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    AnyTensorOrNone:$offsetT,
+    AnyTensorOrNone:$endsT,
+    AnyTensorOrNone:$stepsT,
+    I64ArrayAttr:$offset,
+    I64ArrayAttr:$steps,
+    I64ArrayAttr:$ends,
+    DefaultValuedAttr<I64ArrayAttr, "{1}">:$axes,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+  let results = (outs AnyTensor:$output);
+  let hasCanonicalizer = 0;
+  let hasVerifier = 0;
+  let extraClassDeclaration = [{
+    tbc::utils::slice_attr_t parseParam();
+  }];
 }
 
 

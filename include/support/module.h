@@ -179,5 +179,6 @@ void bindShapeTensorValue(const Value &v, const std::vector<int64_t> &shape);
 std::vector<int64_t> getShapeTensorValue(const Value &v);
 bool isShape(const Value &v);
 
+
 } // namespace module
 } // namespace tbc

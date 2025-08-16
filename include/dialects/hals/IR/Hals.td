@@ -240,9 +240,28 @@ def Hal_EltwiseOp: Hal_Op<"Eltwise"> {
   let arguments = (ins
     AnyHalTensor:$input1,
     AnyHalTensor:$input2,
-    Hal_EltwiseModeAttr:$opType
+    Hal_EltwiseModeAttr:$opType,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
   let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
+}
+
+def Hal_EltwiseConstOp: Hal_Op<"EltwiseConst"> {
+  let summary = "element-wise operator";
+  let description = [{
+    result = op1[i] op op2[i]
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input1,
+    F64Attr:$constValue,
+    Hal_EltwiseModeAttr:$opType,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
 }
 
 def Hal_LutOp : Hal_Op<"Lut"> {
@@ -255,11 +274,26 @@ def Hal_LutOp : Hal_Op<"Lut"> {
     AnyHalTensor:$lut_x,
     AnyHalTensor:$lut_y,
     AnyHalTensor:$lut_k,
-    Hal_LutAttr:$lut_attr
+    Hal_LutAttr:$lut_attr,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
   let hasCanonicalizer = 0;
-  let results = (outs AnyTensor:$output);
+  let results = (outs AnyHalTensor:$output);
 }
+
+def Hal_LoadOp : Hal_Op<"Load"> {
+  let summary = "load operator";
+  let description = [{
+    load data from ddr/l2/l1 memory space
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
+}
+
 
 def Hal_ScaleOp : Hal_Op<"Scale"> {
   let summary = "scale operator";
@@ -268,12 +302,41 @@ def Hal_ScaleOp : Hal_Op<"Scale"> {
   }];
   let arguments = (ins
     AnyHalTensor:$input,
-    AnyHalTensor:$scale,
-    AnyHalTensor:$bias,
+    F64Attr:$scale,
+    F64Attr:$bias,
     DefaultValuedAttr<BoolAttr, "false">:$negative_bias
   );
   let hasCanonicalizer = 0;
-  let results = (outs AnyTensor:$output);
+  let results = (outs AnyHalTensor:$output);
+}
+
+def Hal_ScaleConstOp : Hal_Op<"ScaleConst"> {
+  let summary = "scale operator";
+  let description = [{
+    res=input * scale+ bias
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input,
+    AnyHalTensor:$scale,
+    AnyHalTensor:$bias,
+    DefaultValuedAttr<BoolAttr, "false">:$negative_bias,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
+}
+
+def Hal_StoreOp : Hal_Op<"Store"> {
+  let summary = "store operator";
+  let description = [{
+    store data to ddr/l2/l1 memory space
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
 }
 
 #endif
