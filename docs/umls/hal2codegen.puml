@@ -56,33 +56,14 @@ package "LayergroupPass" {
     hwSchedulePass --> SRAMMallocPass
 }
 
-rectangle "operator dialect" as operator <<dialect>>
-rectangle "kernel dialect" as kernel <<dialect>>
 rectangle "hal dialect" as hal <<dialect>>
-rectangle "converter" as converter
 rectangle "model for certain target" as model_for_certain_target
 
-() "model from other platform" as model_from_other_platform
-() "IMPORED" as IMPORTED <<compilephase>>
-() "OPERATOR_OPTED" as OPERATOR_OPTSED <<compilephase>>
-() "KERNEL" as KERNEL <<compilephase>>
-() "KERNEL_OPTED" as KERNEL_OPTED <<compilephase>>
+
 () "HAL" as HAL <<compilephase>>
 () "HAL_OPTED" as HAL_OPTED <<compilephase>>
 () "HAL_ADDRESSED" as HAL_ADDRESSED <<compilephase>>
 () "CODEGEN" as CODEGEN <<compilephase>>
-
-() "operatorPlatformDependentPass" as operatorPlatformDependentPass <<pass>>
-() "canonicalPass" as canonicalPass <<pass>>
-() "shapeInferencePass" as shapeInferencePass <<pass>>
-() "typeInferencePass" as typeInferencePass <<pass>>
-() "weightFolderPass" as weightFolderPass <<pass>>
-
-() "TargetAssignPass" as TargetAssignPass <<pass>>
-() "kernelTargetDependentPass" as kernelTargetDependentPass <<pass>>
-() "KernelFusePass" as KernelFusePass <<pass>>
-() "ExcuteOnNpuPass" as ExcuteOnNpuPass <<pass>>
-() "KernelTargetVerfiyPass" as KernelTargetVerfiyPass <<pass>>
 
 () "LegalizePass" as LegalizePass <<pass>>
 () "HalTargetDependentPass" as HalTargetDependentPass <<pass>>
@@ -91,35 +72,13 @@ rectangle "model for certain target" as model_for_certain_target
 () "weightPackPass" as weightPackPass <<pass>>
 () "AssemblePass" as AssemblePass <<pass>>
 () "HalTargetVerfiyPass" as HalTargetVerfiyPass <<pass>>
-() "LoweringToKernel" as LoweringToKernel <<conversion>>
-() "LoweringToHal" as LoweringToHal <<conversion>>
 () "CodegenPass" as CodegenPass <<conversion>>
 
 ' 连接关系
 
-model_from_other_platform --> converter: using python
-converter --> operator
-operator -> IMPORTED
-IMPORTED --> operatorPlatformDependentPass
-operatorPlatformDependentPass --> canonicalPass
-canonicalPass --> shapeInferencePass
-shapeInferencePass --> typeInferencePass
-typeInferencePass --> weightFolderPass
-weightFolderPass --> OPERATOR_OPTSED
-OPERATOR_OPTSED --> LoweringToKernel
-LoweringToKernel -left-> kernel :lowering
-kernel -left-> KERNEL
-KERNEL -->TargetAssignPass
-TargetAssignPass --> kernelTargetDependentPass
-kernelTargetDependentPass --> KernelFusePass
-KernelFusePass --> ExcuteOnNpuPass
-ExcuteOnNpuPass --> KernelTargetVerfiyPass
-KernelTargetVerfiyPass --> KERNEL_OPTED
-KERNEL_OPTED --> LoweringToHal
-LoweringToHal --> hal :lowering
 hal -> HAL
 HAL -> LegalizePass
-LegalizePass --> HalTargetDependentPass
+LegalizePass --> HalTargetDependentPass 
 HalTargetDependentPass --> HAL_OPTED
 HAL_OPTED --> LayergroupPass
 LayergroupPass --> InsertSyncPass

@@ -1,0 +1,74 @@
+@startuml 
+!define RECTANGLE class
+
+package "Transform Module" {
+    abstract class BaseConverter {
+        # mlir_context: MLIRContext
+        # builder: OpBuilder
+        + __init__(context: MLIRContext)
+        + {abstract} convert(model: Any): Module
+        + {abstract} validate_model(model: Any): bool
+        # create_operator_dialect_op(op_name: str, ...): Operation
+        # get_tensor_type(shape: List[int], dtype: Type): TensorType
+        # handle_unsupported_op(op: Any): Operation
+    }
+
+    class OnnxConverter extends BaseConverter {
+        - onnx_model: onnx.ModelProto
+        + convert(onnx_model: onnx.ModelProto): Module
+        + validate_model(onnx_model: onnx.ModelProto): bool
+        - convert_onnx_node(node: onnx.NodeProto): Operation
+        - map_onnx_type_to_mlir(onnx_type: int): Type
+        - handle_onnx_attributes(attrs: Dict): Dict
+    }
+
+    class TorchConverter extends BaseConverter {
+        - torch_model: torch.nn.Module
+        - trace_graph: torch.fx.Graph
+        + convert(torch_model: torch.nn.Module): Module
+        + validate_model(torch_model: torch.nn.Module): bool
+        - trace_model(model: torch.nn.Module): torch.fx.Graph
+        - convert_torch_node(node: torch.fx.Node): Operation
+        - map_torch_type_to_mlir(torch_type: torch.dtype): Type
+    }
+
+    class SvJsonConverter extends BaseConverter {
+        - json_model: Dict
+        + convert(json_model: Dict): Module
+        + validate_model(json_model: Dict): bool
+        - parse_json_structure(json_data: Dict): List
+        - convert_json_op(op_data: Dict): Operation
+        - validate_json_schema(json_data: Dict): bool
+    }
+}
+
+package "Tools Module" {
+    class ModelTransformer {
+        - converters: Dict[str, BaseConverter]
+        + __init__()
+        + register_converter(format: str, converter: BaseConverter): void
+        + transform(model: Any, source_format: str, target_format: str = "operator_dialect"): Module
+        + get_supported_formats(): List[str]
+        + auto_detect_format(model: Any): str
+        - create_converter(format: str): BaseConverter
+    }
+}
+
+' 关系定义
+ModelTransformer --> BaseConverter : uses
+ModelTransformer --> OnnxConverter : creates
+ModelTransformer --> TorchConverter : creates  
+ModelTransformer --> SvJsonConverter : creates
+
+' 注释
+note right of BaseConverter : 抽象基类，定义了\n转换器的通用接口\n和MLIR操作的基础方法
+
+note right of OnnxConverter : 专门处理ONNX模型\n转换到operator dialect
+
+note right of TorchConverter : 处理PyTorch模型\n使用FX图进行转换
+
+note right of SvJsonConverter : 处理自定义JSON格式\n模型的转换
+
+note right of ModelTransformer : 统一的模型转换入口\n支持多种格式的自动识别\n和转换
+
+@enduml

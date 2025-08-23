@@ -1,0 +1,59 @@
+@startuml
+!define RECTANGLE class
+
+skinparam stereotypeDisplay none
+
+hide stereotype
+skinparam minClassWidth 100
+skinparam nodesep 20
+skinparam ranksep 5
+'skinparam packageStyle rectangle
+'skinparam linetype ortho
+'skinparam arrowThickness 1
+
+
+skinparam rectangle {
+    BackgroundColor White
+    BorderColor Black
+}
+
+skinparam rectangle<<dialect>> {
+    BackgroundColor Yellow
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<compilephase>> {
+    BackgroundColor Red
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<pass>> {
+    BackgroundColor Green
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<conversion>> {
+    BackgroundColor DarkBlue
+    BorderColor Black
+    FontColor Black
+}
+
+
+rectangle "operator dialect" as operator <<dialect>>
+rectangle "converter" as converter
+
+() "model from other platform" as model_from_other_platform
+() "IMPORED" as IMPORTED <<compilephase>>
+
+
+' 连接关系
+
+model_from_other_platform --> converter: 使用 python 实现的转换类
+converter --> operator
+operator --> IMPORTED
+
+
+@enduml

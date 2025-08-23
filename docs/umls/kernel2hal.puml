@@ -1,0 +1,71 @@
+@startuml
+!define RECTANGLE class
+
+skinparam stereotypeDisplay none
+
+hide stereotype
+skinparam minClassWidth 100
+skinparam nodesep 20
+skinparam ranksep 5
+'skinparam packageStyle rectangle
+'skinparam linetype ortho
+'skinparam arrowThickness 1
+
+
+skinparam rectangle {
+    BackgroundColor White
+    BorderColor Black
+}
+
+skinparam rectangle<<dialect>> {
+    BackgroundColor Yellow
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<compilephase>> {
+    BackgroundColor Red
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<pass>> {
+    BackgroundColor Green
+    BorderColor Black
+    FontColor Black
+}
+
+skinparam interface<<conversion>> {
+    BackgroundColor DarkBlue
+    BorderColor Black
+    FontColor Black
+}
+
+rectangle "kernel dialect" as kernel <<dialect>>
+rectangle "hal dialect" as hal <<dialect>>
+
+
+() "KERNEL" as KERNEL <<compilephase>>
+() "KERNEL_OPTED" as KERNEL_OPTED <<compilephase>>
+
+
+() "TargetAssignPass" as TargetAssignPass <<pass>>
+() "kernelTargetDependentPass" as kernelTargetDependentPass <<pass>>
+() "KernelFusePass" as KernelFusePass <<pass>>
+() "ExcuteOnNpuPass" as ExcuteOnNpuPass <<pass>>
+() "KernelTargetVerfiyPass" as KernelTargetVerfiyPass <<pass>>
+() "LoweringToHal" as LoweringToHal <<conversion>>
+
+' 连接关系
+
+
+kernel -left-> KERNEL
+KERNEL -->TargetAssignPass
+TargetAssignPass --> kernelTargetDependentPass
+kernelTargetDependentPass --> KernelFusePass
+KernelFusePass --> ExcuteOnNpuPass
+ExcuteOnNpuPass --> KernelTargetVerfiyPass
+KernelTargetVerfiyPass --> KERNEL_OPTED
+KERNEL_OPTED --> LoweringToHal
+LoweringToHal --> hal :lowering
+@enduml
