@@ -1,3 +1,2 @@
 add_mlir_interface(ShapeInferInterface)
 add_mlir_interface(TypeInferInterface)
-add_mlir_interface(ExternalExeInterface)

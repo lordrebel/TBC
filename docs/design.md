@@ -34,7 +34,6 @@
 |    硬件抽象层     |       *HAL*/*Hardware Abstraction Layer*       |                      屏蔽底层硬件差异的抽象层，提供统一的硬件操作接口                      |                                                                       无                                                                       |
 |      规范化       |       *canonicalize*/*canonicalization*        |         将IR转换为标准形式的过程，消除冗余操作、简化表达式，使代码更易于分析和优化         |                                   [MLIR Canonicalization文档](https://mlir.llvm.org/docs/Canonicalization/)                                    |
 |     算子正交      |            *operator orthogonality*            |  设计原则，要求每个算子具有独立明确的功能，算子间功能不重叠，通过组合基础算子实现复杂功能  | [TVM Relay设计](https://tvm.apache.org/docs/arch/relay_intro.html) [正交性设计原则](https://en.wikipedia.org/wiki/Orthogonality_(programming)) |
-|   外部算子    | External Op |      运行在非target上的op，通常是cpu/dsp等                      |                                 无                                          |
 |     降级      |                   *lowering*                   |     编译器中将高级抽象转换为低级表示的过程，逐步接近硬件实现     |                                                                       无                                                                       |
 |     转换      |                 *conversion*                   |   在不同dialect之间进行IR转换的机制，通过模式匹配将源dialect的操作转换为目标dialect的操作   |                                   [MLIR Conversion文档](https://mlir.llvm.org/docs/DialectConversion/)                                    |
 |   转换模式    |              *conversion pattern*              |     定义如何将一个dialect中的操作转换为另一个dialect中操作的规则     |                                                                       无                                                                       |
@@ -101,7 +100,7 @@
 ```
 
 #### kernel dialect
-对 `硬件平台支持算子的统一抽象`，表示深度学习的算子在硬件平台上的具体实现，在这个层级要求`算子正交`，同时算子类型是固定的因此在 从operator dialect 到 kernel dialect 的lowering 要进行算子的 1对多的转换。 在该dialect上主要进行如下功能：1.一些硬件相关的图优化，2.基于特定硬件的算子融合，3.判定出硬件不支持的算子并将其设定成外部算子（external Op）。     
+对 `硬件平台支持算子的统一抽象`，表示深度学习的算子在硬件平台上的具体实现，在这个层级要求`算子正交`，同时算子类型是固定的因此在 从operator dialect 到 kernel dialect 的lowering 要进行算子的 1对多的转换。 在该dialect上主要进行如下功能：1.一些硬件相关的图优化，2.基于特定硬件的算子融合.     
 
 **设计目标：**  
 - **计算原语化**：将高级算子分解为硬件友好的基础计算原语  
@@ -183,14 +182,13 @@
 ![](./umls/kernel2hal.png)  
 
 **功能描述**  
-该阶段实现从kernel dialect lowering到 hal dialect的过程，首先根据用户输入的target（目标硬件）给module设置一个属性表示最终的编译目标硬件平台，然后根据目标硬件平台的不同，调用不同的图优化pass。然后执行kernel融合pass，将支持融合的算子融合到一起。然后对于不同的目标硬件平台，判定哪些算子应当是external Op，并将其转换成externalOp。最后根据不同的目标硬件平台验证kernelOp在当前硬件平台是否能执行，如果不能，则报错退出。  
+该阶段实现从kernel dialect lowering到 hal dialect的过程，首先根据用户输入的target（目标硬件）给module设置一个属性表示最终的编译目标硬件平台，然后根据目标硬件平台的不同，调用不同的图优化pass。然后执行kernel融合pass，将支持融合的算子融合到一起。最后根据不同的目标硬件平台验证kernelOp在当前硬件平台是否能执行，如果不能，则报错退出。  
 
 **相关Pass**  
 
 *TargetAssiginPass*:  根据命令行输入的编译目标为module设置一个属性表示最终编译的目标硬件平台。详细设计见：*Pass设计-功能Pass-TargetAssiginPass*  
 *KernelTargetDependentPass*:  执行一些和硬件编译平台相关的图优化pass。详细设计见：*Pass设计-功能Pass-KernelTargetDependentPass*  
 *KernelFusePass*:  执行算子融合，包括但不限于针对conv/mpu的和激活融合，以及其他算子和relu融合等。详细设计见：*Pass设计-功能Pass-KernelFusePass*   
-*ExternalOnNpuPass*:  判定Op是否需要转成外部算子（externalOp）运行在cpu或其他计算设备上。详细设计见：*Pass设计-功能Pass-ExternalOnNpuPass*  
 *KernelTargetVerifyPass*: 验证kernelOp是否符合目标硬件要求。详细设计见：*Pass设计-功能Pass-KernelTargetVerifyPass*     
 
 **相关Interface**  
@@ -361,16 +359,6 @@ Kernel dialect
 
 **详细设计**  
 （TODO） 
-
-##### ExternalOnNpuPass  
-**dialect**  
-Kernel dialect  
-
-**interface**  
-无    
-
-**详细设计**  
-（TODO）
 
 ##### LegalizePass  
 (TODO)  

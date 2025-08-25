@@ -52,7 +52,6 @@ rectangle "hal dialect" as hal <<dialect>>
 () "TargetAssignPass" as TargetAssignPass <<pass>>
 () "kernelTargetDependentPass" as kernelTargetDependentPass <<pass>>
 () "KernelFusePass" as KernelFusePass <<pass>>
-() "ExcuteOnNpuPass" as ExcuteOnNpuPass <<pass>>
 () "KernelTargetVerfiyPass" as KernelTargetVerfiyPass <<pass>>
 () "LoweringToHal" as LoweringToHal <<conversion>>
 
@@ -63,8 +62,7 @@ kernel -left-> KERNEL
 KERNEL -->TargetAssignPass
 TargetAssignPass --> kernelTargetDependentPass
 kernelTargetDependentPass --> KernelFusePass
-KernelFusePass --> ExcuteOnNpuPass
-ExcuteOnNpuPass --> KernelTargetVerfiyPass
+KernelFusePass --> KernelTargetVerfiyPass
 KernelTargetVerfiyPass --> KERNEL_OPTED
 KERNEL_OPTED --> LoweringToHal
 LoweringToHal --> hal :lowering

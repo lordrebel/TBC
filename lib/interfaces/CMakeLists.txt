@@ -2,7 +2,6 @@ set(
   LLVM_OPTIONAL_SOURCES
   ShapeInferInterface.cpp
   TypeInferInterface.cpp
-  ExternalExeInterface.cpp
 )
 
 function(add_mlir_interface_library name)
@@ -24,5 +23,4 @@ endfunction(add_mlir_interface_library)
 
 add_mlir_interface_library(ShapeInferInterface)
 add_mlir_interface_library(TypeInferInterface)
-add_mlir_interface_library(ExternalExeInterface)
 

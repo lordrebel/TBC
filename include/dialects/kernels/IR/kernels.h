@@ -8,7 +8,6 @@
 #include "mlir/IR/DialectImplementation.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
-#include "interfaces/externalExe_interface.h"
 
 #include "traits/traits.h"
 #include"support/utils.h"

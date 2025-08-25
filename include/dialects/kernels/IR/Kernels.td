@@ -4,7 +4,6 @@ include "mlir/IR/AttrTypeBase.td"
 include "mlir/IR/OpBase.td"
 include "mlir/IR/EnumAttr.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
-include "interfaces/ExternalExeInterface.td"
 
 // =============================================================================
 //
@@ -152,9 +151,7 @@ class Kernel_BaseOp<string mnemonic, list<Trait> traits = []> :
 
 class Kernel_Op<string mnemonic, list<Trait> traits = []> :
     Op<Kernel_Dialect, mnemonic, !listconcat(traits,
-       [
-        DeclareOpInterfaceMethods<ExecuteOnNPU>,
-       ])> ;
+       [])> ;
 
 def Kernel_ActiveOp: Kernel_Op<"Active",[]>{
   let summary = "Active operator";

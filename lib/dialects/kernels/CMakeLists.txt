@@ -15,7 +15,6 @@ add_mlir_library(TBCKernels
   MLIRKernelAttrGen
 	MLIROperatorsIncGen
   MLIRKernelsIncGen
-	MLIRExternalExeInterfaceIncGen
 
   LINK_LIBS PUBLIC
   MLIRIR
@@ -26,6 +25,5 @@ add_mlir_library(TBCKernels
   MLIRRewrite
   MLIRTransforms
 	MLIRTBCSupport
-  MLIRExternalExeInterface
 
 )
