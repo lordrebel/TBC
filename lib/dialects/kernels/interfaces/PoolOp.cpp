@@ -1,4 +1,4 @@
-#include"dialects/kernels/IR/Kernels.h"
+#include"dialects/kernels/IR/kernels.h"
 #include "support/module.h"
 pool_attr_t tbc::kls::Pool1DOp::parseParam() {
   pool_attr_t p = {0};

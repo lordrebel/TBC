@@ -1,4 +1,4 @@
-#include"dialects/kernels/IR/Kernels.h"
+#include"dialects/kernels/IR/kernels.h"
 #include "support/mathutil.h"
 #include "support/module.h"
 permute_attr_t tbc::kls::PermuteOp::parseParam() {

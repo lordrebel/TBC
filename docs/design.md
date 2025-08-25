@@ -10,6 +10,19 @@
 |   深度学习框架    |                   *platform*                   |                 不同的深度学习平台，如 tensorflow/pytorch/tflite/caffe 等                  |                                                                       无                                                                       |
 |   多级中间表示    | Multi-Level Intermediate Representation/*mlir* |                           用于构建可重用和可扩展的编译器基础设施                           |                                                       [MLIR官网](https://mlir.llvm.org/)                                                       |
 |       方言        |                   *dialect*                    | MLIR中的扩展机制，定义了特定领域的操作、类型和属性，允许在统一框架下表示不同抽象层次的计算 |                                        [MLIR Dialect文档](https://mlir.llvm.org/docs/LangRef/#dialects)                                        |
+|       类型        |                     *type*                     |        MLIR中的数据类型系统，定义了值的结构和语义，包括张量类型、标量类型等        |                                          [MLIR Type System文档](https://mlir.llvm.org/docs/LangRef/#type-system)                                           |
+|       属性        |                  *attribute*                   |    MLIR中用于存储编译时常量信息的机制，如算子参数、配置选项等静态数据    |                                        [MLIR Attributes文档](https://mlir.llvm.org/docs/LangRef/#attributes)                                        |
+|       接口        |                  *interface*                   |   MLIR中定义操作、类型或属性行为契约的机制，提供统一的方法调用接口   |                                   [MLIR Interfaces文档](https://mlir.llvm.org/docs/Interfaces/)                                    |
+|       操作        |                 *operation*                    |      MLIR中的基本计算单元，包含操作码、操作数、结果和属性等信息      |                                                                       无                                                                       |
+|     张量类型      |                 *tensor type*                  |        表示多维数组的类型，包含形状、元素类型等信息        |                                                                       无                                                                       |
+|     内存引用      |                   *memref*                     |    MLIR中表示内存缓冲区的类型，用于低级内存操作和优化    |                                        [MLIR MemRef文档](https://mlir.llvm.org/docs/Dialects/Builtin/#memreftype)                                        |
+|     操作数        |                   *operand*                    |        操作的输入值，可以是其他操作的结果或函数参数        |                                                                       无                                                                       |
+|       结果        |                   *result*                     |        操作产生的输出值，可以作为其他操作的操作数        |                                                                       无                                                                       |
+|       区域        |                   *region*                     |   MLIR中包含基本块序列的结构，用于表示控制流和作用域   |                                        [MLIR Regions文档](https://mlir.llvm.org/docs/LangRef/#regions)                                        |
+|      基本块       |                    *block*                     |        包含操作序列的基本执行单元，具有唯一的入口点        |                                                                       无                                                                       |
+|       位置        |                  *location*                    |    MLIR中用于调试和错误报告的源代码位置信息    |                                        [MLIR Locations文档](https://mlir.llvm.org/docs/LangRef/#locations)                                        |
+|    表格生成       |                  *TableGen*                    |   MLIR使用的代码生成工具，用于从声明式描述生成C++代码   |                                   [TableGen文档](https://llvm.org/docs/TableGen/)                                    |
+|      特征         |                    *trait*                     |    定义操作通用属性和约束的机制，如可交换性、副作用等    |                                        [MLIR Traits文档](https://mlir.llvm.org/docs/Traits/)                                        |
 |       过程        |                     *pass*                     | Pass是编译器中的一个处理单元，它遍历整个程序（或程序的一部分），执行特定的分析或转换操作。 |                                          [MLIR Pass文档](https://mlir.llvm.org/docs/PassManagement/)                                           |
 | 模式/模式匹配重写 |   *pattern*/*patternMatch*/*patternRewrite*    |     MLIR中用于定义代码转换规则的机制，通过匹配特定的IR模式并将其重写为等价或优化的形式     |                                   [MLIR Pattern Rewriting文档](https://mlir.llvm.org/docs/PatternRewriter/)                                    |
 |     编译阶段      |                 *compilephase*                 |  编译器将源代码转换为目标代码过程中的不同抽象层次，每个阶段代表程序在特定表示形式下的状态  |                                                                       无                                                                       |
@@ -170,7 +183,7 @@
 ![](./umls/kernel2hal.png)  
 
 **功能描述**  
-该阶段实现从kernel dialect lowering到 hal dialect的过程，首先根据用户输入的target（目标硬件）给module设置一个属性表示最终的编译目标硬件平台，然后根据目标硬件平台的不同，调用不同的图优化pass。然后执行kernel融合pass，将支持融合的算子融合到一起。然后对于不同的目标硬件平台，判定哪些算子应当是external Op，并将其转换成externalOp。最后根据不同的目标硬件平台验证kernelOp在当前硬件平台是否能执行，如果不能，则报错推出。  
+该阶段实现从kernel dialect lowering到 hal dialect的过程，首先根据用户输入的target（目标硬件）给module设置一个属性表示最终的编译目标硬件平台，然后根据目标硬件平台的不同，调用不同的图优化pass。然后执行kernel融合pass，将支持融合的算子融合到一起。然后对于不同的目标硬件平台，判定哪些算子应当是external Op，并将其转换成externalOp。最后根据不同的目标硬件平台验证kernelOp在当前硬件平台是否能执行，如果不能，则报错退出。  
 
 **相关Pass**  
 
@@ -194,9 +207,9 @@
 
 **相关Pass**  
 
-*LegalizePass*：对于不同硬件平台对逐个halOp进行legalize，使其满足指定的硬件平台的硬件约束。 *Pass设计-功能Pass-LegalizePass*    
-*HalTargetDependentPass*：基于硬件平台相关的图优化。*Pass设计-功能Pass-HalTargetDependentPass*  
-*HalTargetVerifyPass*： 验证halop算子是否满足特定硬件平台的硬件约束。*Pass设计-debugPass-HalTargetVerifyPass*  
+*LegalizePass*：对于不同硬件平台对逐个halOp进行legalize，使其满足指定的硬件平台的硬件约束。详细设计见： *Pass设计-功能Pass-LegalizePass*    
+*HalTargetDependentPass*：基于硬件平台相关的图优化。详细设计见：*Pass设计-功能Pass-HalTargetDependentPass*  
+*HalTargetVerifyPass*： 验证halop算子是否满足特定硬件平台的硬件约束。详细设计见：*Pass设计-debugPass-HalTargetVerifyPass*  
 *LayerGroupPass*： 实现基于内存的算子分组（group）以及chw切分（tiling）+cascade，然后进行算子调度，根据算子调度的结果在SRAM上进行内存划分。详细设计参见：*Pass设计-功能Pass-LayerGroupPass*   
 *InsertSync*：  根据layergroup的结果生成硬件sync信息。详细设计参见：*Pass设计-功能Pass-InsertSync*  
 *WeightPackPass*：将权重打包起来最终生成独立的权重文件 详细设计参见： *Pass设计-功能Pass-WeightPackPass*  
@@ -227,6 +240,10 @@
 ##### type  
 （TODO）  
 
+##### trait  
+（TODO）  
+
+
 #### kernel dialect  
 （TODO）  
 
@@ -239,6 +256,9 @@
 ##### type  
 （TODO）  
 
+##### trait  
+（TODO）  
+
 #### hal dialect  
 （TODO）  
 
@@ -249,6 +269,9 @@
 （TODO）   
 
 ##### type  
+（TODO）  
+
+##### trait  
 （TODO）  
 
 ### pass 设计  
@@ -274,25 +297,80 @@ operator dialect
 （TODO）  
 
 ##### CannonicalPass
-(TODO)  
+这个其实是mlir 内置的pass，当定义op时 设置 `let hasCnonicalizer = 1` 时，使能，同时需要为op提供接口:`getCanonicalizationPatterns`返回此op在canonical pass下需要执行的优化pattern
+
+**dialect**  
+operator dialect  
+
+**interface**  
+无    
+
+**详细设计**  
+（TODO）
 
 ##### ShapeInferPass
-(TODO)    
+这个pass 依次遍历module中的所有function的所有op，为每个op执行shape_infernece, 每个op的shape inference 要根据输入的shape 推出其输出的shape，并设置shape
 
-##### TypeInferpass
-(TODO)  
+**dialect**  
+operator dialect  
+
+**interface**  
+ShapeInferInterface，其提供接口`Shape_inference` operator dialect 每个op 都应当实现此接口    
+
+**详细设计**  
+（TODO）   
+
+##### TypeInferpass  
+这个pass 依次遍历module中的所有function的所有op，为每个op执行type_infernece, 每个op的type inference 要根据输入的type 推出其输出的type，并设置type
+
+**dialect**  
+operator dialect  
+
+**interface**  
+TypeInferInterface，其提供接口`Type_inference` operator dialect 每个op 都应当实现此接口     
+
+**详细设计**  
+（TODO）
 
 ##### TargetAssiginPass
-(TODO)  
+**dialect**  
+Kernel dialect  
+
+**interface**  
+无    
+
+**详细设计**  
+（TODO）
 
 ##### KernelTargetDependentPass  
-(TODO)  
+**dialect**  
+Kernel dialect  
+
+**interface**  
+无    
+
+**详细设计**  
+（TODO）
 
 ##### KernelFusePass  
-(TODO)  
+**dialect**  
+Kernel dialect  
+
+**interface**  
+无    
+
+**详细设计**  
+（TODO） 
 
 ##### ExternalOnNpuPass  
-(TODO)  
+**dialect**  
+Kernel dialect  
+
+**interface**  
+无    
+
+**详细设计**  
+（TODO）
 
 ##### LegalizePass  
 (TODO)  
