@@ -210,6 +210,7 @@
 *HalTargetVerifyPass*： 验证halop算子是否满足特定硬件平台的硬件约束。详细设计见：*Pass设计-debugPass-HalTargetVerifyPass*  
 *LayerGroupPass*： 实现基于内存的算子分组（group）以及chw切分（tiling）+cascade，然后进行算子调度，根据算子调度的结果在SRAM上进行内存划分。详细设计参见：*Pass设计-功能Pass-LayerGroupPass*   
 *InsertSync*：  根据layergroup的结果生成硬件sync信息。详细设计参见：*Pass设计-功能Pass-InsertSync*  
+*DDRMemAssginPass*: 基于layergroup的产生结果，对ddr进行分配  
 *WeightPackPass*：将权重打包起来最终生成独立的权重文件 详细设计参见： *Pass设计-功能Pass-WeightPackPass*  
 *AssemblePass*：生成ISA相关的属性放到op中。详细设计参见：*Pass设计-功能Pass-AssemblePass*  
 

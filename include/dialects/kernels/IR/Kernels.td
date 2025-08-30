@@ -297,9 +297,7 @@ def Kernel_LutOp : Kernel_Op<"Lut"> {
     AnyTensor:$lut_x,
     AnyTensor:$lut_y,
     AnyTensor:$lut_k,
-    Kernel_LutAttr:$lut_attr,
-    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
-    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+    Kernel_LutAttr:$lut_attr
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyTensor:$output);

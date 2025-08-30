@@ -67,6 +67,7 @@ rectangle "model for certain target" as model_for_certain_target
 
 () "LegalizePass" as LegalizePass <<pass>>
 () "HalTargetDependentPass" as HalTargetDependentPass <<pass>>
+() "DDRMemAssignPass" as DDRMemAssignPass <<pass>>
 ' () "LayergroupPass" as LayergroupPass <<pass>>
 () "InsertSyncPass" as InsertSyncPass <<pass>>
 () "weightPackPass" as weightPackPass <<pass>>
@@ -82,7 +83,8 @@ LegalizePass --> HalTargetDependentPass
 HalTargetDependentPass --> HAL_OPTED
 HAL_OPTED --> LayergroupPass
 LayergroupPass --> InsertSyncPass
-InsertSyncPass --> HAL_ADDRESSED
+InsertSyncPass --> DDRMemAssignPass
+DDRMemAssignPass --> HAL_ADDRESSED
 HAL_ADDRESSED --> HalTargetVerfiyPass
 HalTargetVerfiyPass --> weightPackPass
 weightPackPass --> AssemblePass

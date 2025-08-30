@@ -132,6 +132,25 @@ def Hal_LutAttr : Hal_Attr<"LutAttr", "lutattr"> {
   );
   let assemblyFormat = "`<` struct(params) `>`";
 }
+def Hal_HardwareType: I32EnumAttr<"HardwareType", "HAL hardware type", [
+  I32EnumAttrCase<"NOT_SET", 0, "not set">,
+  I32EnumAttrCase<"MPU", 1, "mpu">,
+  I32EnumAttrCase<"VPU", 2, "vpu">,
+  I32EnumAttrCase<"MTE", 3, "mte">,
+  I32EnumAttrCase<"SPU", 4, "spu">,
+]> {
+  let cppNamespace = "::tbc::hals";
+  let genSpecializedAttr = 0;
+}
+
+def Hal_HardwareInfoAttr : Hal_Attr<"HardwareInfoAttr", "hardwareinfoattr"> {
+  let summary = "Structure of hardware info";
+  let parameters = (ins
+    "tbc::hals::HardwareType":$type,
+    "int32_t": $id
+  );
+  let assemblyFormat = "`<` struct(params) `>`";
+}
 //===----------------------------------------------------------------------===//
 // Hals Types.
 //===----------------------------------------------------------------------===//
@@ -143,7 +162,7 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
     A custom tensor type for HAL dialect that includes memory space,
     storage layout, and other hardware-specific information.
   }];
-  //shape try to use ArrayRefParameter!!!
+
   let parameters = (ins
     ArrayRefParameter<"int64_t">:$shape,
     "mlir::Type":$elementType,
@@ -242,7 +261,8 @@ def Hal_EltwiseOp: Hal_Op<"Eltwise"> {
     AnyHalTensor:$input2,
     Hal_EltwiseModeAttr:$opType,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
-    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
+    OptionalAttr<HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -258,7 +278,8 @@ def Hal_EltwiseConstOp: Hal_Op<"EltwiseConst"> {
     F64Attr:$constValue,
     Hal_EltwiseModeAttr:$opType,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
-    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
+    OptionalAttr<HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -275,8 +296,7 @@ def Hal_LutOp : Hal_Op<"Lut"> {
     AnyHalTensor:$lut_y,
     AnyHalTensor:$lut_k,
     Hal_LutAttr:$lut_attr,
-    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
-    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+    OptionalAttr<HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -288,7 +308,8 @@ def Hal_LoadOp : Hal_Op<"Load"> {
     load data from ddr/l2/l1 memory space
   }];
   let arguments = (ins
-    AnyHalTensor:$input
+    AnyHalTensor:$input,
+    OptionalAttr<HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -304,7 +325,10 @@ def Hal_ScaleOp : Hal_Op<"Scale"> {
     AnyHalTensor:$input,
     F64Attr:$scale,
     F64Attr:$bias,
-    DefaultValuedAttr<BoolAttr, "false">:$negative_bias
+    DefaultValuedAttr<BoolAttr, "false">:$negative_bias,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
+    OptionalAttr<HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -321,7 +345,8 @@ def Hal_ScaleConstOp : Hal_Op<"ScaleConst"> {
     AnyHalTensor:$bias,
     DefaultValuedAttr<BoolAttr, "false">:$negative_bias,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
-    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
+    OptionalAttr<HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -333,7 +358,8 @@ def Hal_StoreOp : Hal_Op<"Store"> {
     store data to ddr/l2/l1 memory space
   }];
   let arguments = (ins
-    AnyHalTensor:$input
+    AnyHalTensor:$input,
+    OptionalAttr<HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
