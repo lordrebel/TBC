@@ -3,11 +3,13 @@
 #include "dialects/kernels/IR/kernels.h"
 #include "dialects/operators/IR/operator.h"
 #include "dialects/operators/transforms/pass.h"
+#include "conversions/conversion.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/PDL/IR/PDL.h"
 #include "mlir/Dialect/PDLInterp/IR/PDLInterp.h"
 #include "mlir/Dialect/Transform/IR/TransformDialect.h"
 #include "mlir/Transforms/Passes.h"
+
 using namespace mlir;
 namespace tbc {
 void registerAllDialects(mlir::DialectRegistry &registry) {
@@ -19,7 +21,7 @@ void registerAllDialects(mlir::DialectRegistry &registry) {
 
 void registerAllPasses() {
   registerCanonicalizer();
-  //  mlir::registerConversionPasses();
+  mlir::registerConversionPasses();
   ops::registeropPasses();
 }
 } // namespace tbc

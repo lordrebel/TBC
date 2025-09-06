@@ -17,8 +17,8 @@ add_mlir_library(TBCInitAll
   MLIRSupport
   MLIRFuncDialect
 
-  TBCOperators
-  TBCKernels
-  TBCHals
+  TbcOperatorsToKernels
+  TbcKernelsToHals
+
 )
 

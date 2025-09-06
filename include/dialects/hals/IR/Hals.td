@@ -262,7 +262,7 @@ def Hal_EltwiseOp: Hal_Op<"Eltwise"> {
     Hal_EltwiseModeAttr:$opType,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
     DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
-    OptionalAttr<HardwareInfoAttr>:$hw_info
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -279,7 +279,7 @@ def Hal_EltwiseConstOp: Hal_Op<"EltwiseConst"> {
     Hal_EltwiseModeAttr:$opType,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
     DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
-    OptionalAttr<HardwareInfoAttr>:$hw_info
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -296,7 +296,7 @@ def Hal_LutOp : Hal_Op<"Lut"> {
     AnyHalTensor:$lut_y,
     AnyHalTensor:$lut_k,
     Hal_LutAttr:$lut_attr,
-    OptionalAttr<HardwareInfoAttr>:$hw_info
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -309,7 +309,7 @@ def Hal_LoadOp : Hal_Op<"Load"> {
   }];
   let arguments = (ins
     AnyHalTensor:$input,
-    OptionalAttr<HardwareInfoAttr>:$hw_info
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -328,7 +328,7 @@ def Hal_ScaleOp : Hal_Op<"Scale"> {
     DefaultValuedAttr<BoolAttr, "false">:$negative_bias,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
     DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
-    OptionalAttr<HardwareInfoAttr>:$hw_info
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -346,7 +346,7 @@ def Hal_ScaleConstOp : Hal_Op<"ScaleConst"> {
     DefaultValuedAttr<BoolAttr, "false">:$negative_bias,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
     DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
-    OptionalAttr<HardwareInfoAttr>:$hw_info
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);
@@ -359,7 +359,7 @@ def Hal_StoreOp : Hal_Op<"Store"> {
   }];
   let arguments = (ins
     AnyHalTensor:$input,
-    OptionalAttr<HardwareInfoAttr>:$hw_info
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyHalTensor:$output);

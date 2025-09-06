@@ -1,0 +1,2 @@
+add_subdirectory(OperatorsToKernels)
+add_subdirectory(KernelsToHals)
