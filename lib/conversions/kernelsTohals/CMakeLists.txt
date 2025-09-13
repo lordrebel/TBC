@@ -1,5 +1,7 @@
 file(GLOB _sources
           *.cpp
+          npuv1/*.cpp
+          npuv2/*.cpp
     )
 
 add_mlir_conversion_library(TbcKernelsToHals

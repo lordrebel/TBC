@@ -143,12 +143,59 @@ def Hal_HardwareType: I32EnumAttr<"HardwareType", "HAL hardware type", [
   let genSpecializedAttr = 0;
 }
 
-def Hal_HardwareInfoAttr : Hal_Attr<"HardwareInfoAttr", "hardwareinfoattr"> {
+def Hal_HardwareInfoAttr : Hal_Attr<"HardwareInfo", "hardwareinfoattr"> {
   let summary = "Structure of hardware info";
   let parameters = (ins
     "tbc::hals::HardwareType":$type,
     "int32_t": $id
   );
+  let assemblyFormat = "`<` struct(params) `>`";
+}
+
+def Hal_CascadeAttr: Hal_Attr<"Cascade", "cascadeattr"> {
+  let summary = "Structure of cascade parameters";
+  let parameters = (ins
+    ArrayRefParameter<"int64_t">:$block_params, //n,c,h,w
+    ArrayRefParameter<"int64_t">:$buffer_addrs,
+    DefaultValuedParameter<"bool", "false">:$is_cascade 
+  );
+  let extraClassDeclaration = [{
+   std::size_t getNumBuffers() const {
+     return getBufferAddrs().size();
+   }
+
+   tbc::utils::block_attr_t getBlockAttr() const {
+     tbc::utils::block_attr_t block;
+     if(!getIsCascade()) {
+       block.n = -1;
+       block.c = -1;
+       block.h = -1;
+       block.w = -1;
+       return block;
+     }
+     auto params = getBlockParams();
+       block.n = params[0];
+       block.c = params[1];
+       block.h = params[2];
+       block.w = params[3];
+     
+     return block;
+   }
+
+   static mlir::LogicalResult verify(
+      llvm::function_ref<mlir::InFlightDiagnostic()> emitError,
+      llvm::ArrayRef<int64_t> block_params,
+      llvm::ArrayRef<int64_t> buffer_addrs,
+      bool is_cascade) {
+      if ( is_cascade && block_params.size() != 4) {
+        return emitError() << "block_params must have exactly 4 elements (n,c,h,w), got " 
+                          << block_params.size();
+      }
+       //TODO more verify?
+      return mlir::success();
+    }
+
+  }];
   let assemblyFormat = "`<` struct(params) `>`";
 }
 //===----------------------------------------------------------------------===//
@@ -169,11 +216,12 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
     DefaultValuedParameter<"MemorySpace", "MemorySpace::NOT_SET">:$memorySpace,
     DefaultValuedParameter<"StorageLayout", "StorageLayout::nchw">:$layout,
     DefaultValuedParameter<"int64_t", "-1">:$addr,
-    DefaultValuedParameter<"TensorKind", "TensorKind::NOT_SET">:$kind
+    DefaultValuedParameter<"TensorKind", "TensorKind::NOT_SET">:$kind,
+    OptionalParameter<"CascadeAttr">: $cascade
 
   );
   
-  let assemblyFormat = "`<` $shape `x` $elementType `,` $memorySpace `,` $layout `,` $addr `,` $kind `>`";
+  let assemblyFormat = "`<` $shape `x` $elementType `,` $memorySpace `,` $layout `,` $addr `,` $kind (`cascade` `=` $cascade^)? `>`";
   
   let builders = [
 
@@ -181,11 +229,11 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
                      "mlir::Type":$elementType,
                      "MemorySpace":$memorySpace), [{
       return $_get($_ctxt, shape, elementType, memorySpace, StorageLayout::nchw,
-                   /*addr=*/-1, TensorKind::NOT_SET); 
+                   /*addr=*/-1, TensorKind::NOT_SET,CascadeAttr()); 
     }]>,
      TypeBuilder<(ins "mlir::TensorType":$ori_tensor), [{
       return $_get($_ctxt,  ori_tensor.getShape(), ori_tensor.getElementType(), MemorySpace::NOT_SET, StorageLayout::nchw,
-                   /*addr=*/-1, TensorKind::NOT_SET); 
+                   /*addr=*/-1, TensorKind::NOT_SET,CascadeAttr()); 
     }]>
    ];
   
@@ -228,7 +276,7 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
 def AnyHalTensor : Type<CPred<"mlir::isa<::tbc::hals::HalTensorType>($_self)">, 
                         "HAL tensor", "::tbc::hals::HalTensorType">;
 
-// 定义任意排名的 HalTensor（类似 AnyRankedTensor）
+// 定义任意rank的 HalTensor（类似 AnyRankedTensor）
 def AnyRankedHalTensor : Type<CPred<"mlir::isa<::tbc::hals::HalTensorType>($_self) && "
                                    "mlir::cast<::tbc::hals::HalTensorType>().getRank() >= 0">, 
                              "ranked HAL tensor", "::tbc::hals::HalTensorType">;

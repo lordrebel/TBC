@@ -301,6 +301,10 @@ def Kernel_LutOp : Kernel_Op<"Lut"> {
   );
   let hasCanonicalizer = 0;
   let results = (outs AnyTensor:$output);
+  let extraClassDeclaration = [{
+     bool isRelu();
+  }];
+  
 }
 
 def Kernel_PadOp : Kernel_Op<"Pad"> {

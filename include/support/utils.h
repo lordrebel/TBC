@@ -229,4 +229,11 @@ typedef struct {
   int64_t groups;
   bool has_bias;
 } convbwd_weight_attr_t;
+
+typedef struct {
+  int32_t n;
+  int32_t c;
+  int32_t h;
+  int32_t w;
+} block_attr_t;
 } // namespace tbc::utils

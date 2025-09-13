@@ -1,5 +1,6 @@
 file(GLOB _sources
           *.cpp
+          opLowering/*.cpp
     )
 
 add_mlir_conversion_library(TbcOperatorsToKernels

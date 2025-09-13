@@ -2,6 +2,7 @@
 
 #include "support/module.h"
 #include"dialects/hals/IR/hals.h"
+#include "support/utils.h"
 
 using namespace tbc::hals;
 using namespace mlir;
