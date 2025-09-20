@@ -170,6 +170,30 @@ def Kernel_ActiveOp: Kernel_Op<"Active",[]>{
   }];
 }
 
+def Kernel_Conv2dOp : Kernel_Op<"Conv2d"> {
+  let summary = "Conv2d operator";
+  let description = [{
+    The operator for 2d convolution function
+  }];
+  let arguments = (ins
+    AnyTensor:$input,
+    AnyTensor:$weight,
+    AnyTensorOrNone:$bias,
+    I64ArrayAttr:$kernel_shape,
+    I64ArrayAttr:$strides,
+    I64ArrayAttr:$pads,
+    DefaultValuedAttr<I64Attr, "1">:$group,
+    OptionalAttr<I64ArrayAttr>:$dilations,
+    OptionalAttr<BoolAttr>:$do_winograd,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
+  );
+  let results = (outs AnyRankedTensor:$output);
+  let extraClassDeclaration = [{
+     tbc::utils::conv_attr_t parseParam();
+  }];
+}
+
 def Kernel_CompareOp: Kernel_Op<"Compare",[]>{
   let summary = "Compare operator";
 
@@ -212,7 +236,7 @@ def Kernel_CompareConstOp: Kernel_Op<"CompareConst",[]>{
   }];
 }
 
-def Kernel_ConcatOp: Kernel_Op<"Concat",[]>{
+def Kernel_ConcatOp: Kernel_Op<"Concat",[]> {
   let summary = "concat operator";
 
   let description = [{
@@ -250,7 +274,7 @@ def Kernel_EltWiseOp: Kernel_Op<"Eltwise",[]>{
   }];
 }
 
-def Kernel_EltWiseConstOp: Kernel_Op<"EltwiseConst",[]>{
+def Kernel_EltWiseConstOp: Kernel_Op<"EltwiseConst",[]> {
   let summary = "Eltwise operator";
 
   let description = [{
@@ -351,7 +375,7 @@ def Kernel_PermuteOp : Kernel_Op<"Permute"> {
 }
 
 class Kernel_PoolOp<string mnemonic, list<Trait> traits = []> : Kernel_Op<mnemonic,
-  !listconcat(traits, [])>{
+  !listconcat(traits, [])> {
   let summary = "pool operator";
   let description = [{
     This operation performs pooling on the input tensor.

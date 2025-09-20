@@ -4,7 +4,18 @@ namespace tbc::ops{
 
   void populateOperatorsToKernelsConversionPatterns(
     mlir::RewritePatternSet &patterns){
-      llvm_unreachable("Not Implemented");
+      patterns.add<
+        AddOpLowering,
+        AddConstOpLowering,
+        MulOpLowering,
+        MulConstOpLowering,
+        SubOpLowering,
+        SubConstOpLowering,
+        DivOpLowering,
+        ReluOpLowering,
+        ActivationLutOpLowering,
+        ConcatOpLowering
+      >(patterns.getContext());
     }
 
 }
