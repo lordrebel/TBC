@@ -10,7 +10,7 @@ LogicalResult DivOpLowering::matchAndRewrite(tbc::ops::DivOp op,
   auto outputType = op.getOutput().getType();
   std::vector<NamedAttribute> attrs;
   attrs.push_back(rewriter.getNamedAttr("mode", rewriter.getStringAttr("Div")));
-  rewriter.replaceOpWithNewOp<tbc::kls::EltWiseConstOp>(op, outputType, input,
+  rewriter.replaceOpWithNewOp<tbc::kls::EltWiseOp>(op, outputType, input,
                                                         attrs);
   return success();
 }

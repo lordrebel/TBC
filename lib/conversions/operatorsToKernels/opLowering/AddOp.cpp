@@ -9,7 +9,7 @@ LogicalResult AddOpLowering::matchAndRewrite(tbc::ops::AddOp op,
   std::vector<NamedAttribute> attrs;
   attrs.push_back(rewriter.getNamedAttr("mode", rewriter.getStringAttr("Add")));
   auto outputType = op.getOutput().getType();
-  rewriter.replaceOpWithNewOp<tbc::kls::EltWiseConstOp>(op, outputType, input);
+  rewriter.replaceOpWithNewOp<tbc::kls::EltWiseOp>(op, outputType, input,attrs);
   return success();
 }
 } // namespace tbc::ops

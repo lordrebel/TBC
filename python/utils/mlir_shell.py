@@ -62,19 +62,23 @@ def mlir_opt_for_operator(mlirfile, opt_mlirfile):
     _os_system(cmd)
 
 
-def mlir_lowering(top_mlir: str,
-                  tpu_mlir: str,
-                  mode: str,
-                  chip: str,
-                  cali_table: str = None,
-                  asymmetric: bool = False,
-                  quantize_table: str = None,
-                  customization_format: str = None,
-                  fuse_preprocess: bool = False,
-                  aligned_input: bool = False,
-                  ignore_f16_overflow: bool = False,
-                  do_winograd: bool = False,
-                  q_group_size: int = 0):
+def mlir_lowering_to_kernel(ops_mlir: str,
+                  kernels_mlir: str,
+                  chip: str):
+    
+    cmd = ["tbc-opt", ops_mlir, "--convert-operators-to-kernels" ]
+    cmd.extend([f"--assign-target=\"target={chip}\" ","-o", kernels_mlir])
+    _os_system(cmd)
+
+def mlir_opt_for_kernel(kls_mlir: str,
+                        opt_kls_mlir: str):
+    pass
+def mlir_lowering_to_hal(kls_mlir: str,
+                  hals_mlir: str):
+    pass
+
+def mlir_opt_for_hal(hals_mlir: str,
+                    opt_hal_mlir: str):
     pass
 
 

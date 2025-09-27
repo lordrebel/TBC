@@ -10,7 +10,6 @@
 #pragma once
 
 #include "mlir/Dialect/Func/IR/FuncOps.h"
-#include "mlir/Dialect/Quant/QuantOps.h"
 #include "dialects/operators/IR/operator.h"
 #include "mlir/IR/BuiltinOps.h"
 

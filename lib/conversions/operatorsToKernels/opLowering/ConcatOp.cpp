@@ -1,4 +1,5 @@
 #include "conversions/OperatorsToKernels/opLowering.h"
+#include "dialects/kernels/IR/kernels.h"
 #include "dialects/operators/IR/operator.h"
 
 using namespace mlir;
@@ -10,7 +11,7 @@ ConcatOpLowering::matchAndRewrite(tbc::ops::ConcatOp op,
   auto input = op->getOperands();
   auto attrs = op->getAttrs();
   auto outputType = op.getOutput().getType();
-  rewriter.replaceOpWithNewOp<tbc::kls::EltWiseConstOp>(op, outputType, input,
+  rewriter.replaceOpWithNewOp<tbc::kls::ConcatOp>(op, outputType, input,
                                                         attrs);
   return success();
 }

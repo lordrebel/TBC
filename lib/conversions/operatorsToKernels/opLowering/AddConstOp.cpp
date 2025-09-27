@@ -8,9 +8,9 @@ namespace tbc::ops{
   LogicalResult AddConstOpLowering::matchAndRewrite(tbc::ops::AddConstOp op,
                                 PatternRewriter &rewriter) const {
     auto input=op.getInput();
-    auto constant=op.getConstVal();
+    auto constant=op.getConstVal().convertToDouble();
     std::vector<NamedAttribute> attrs;
-    attrs.push_back(rewriter.getNamedAttr("const_val", rewriter.getF32FloatAttr(constant.convertToFloat())));
+    attrs.push_back(rewriter.getNamedAttr("const_val", rewriter.getF64FloatAttr(constant)));
     attrs.push_back(rewriter.getNamedAttr("mode", rewriter.getStringAttr("Add")));
     auto outputType=op.getOutput().getType();
     rewriter.replaceOpWithNewOp<tbc::kls::EltWiseConstOp>(op, outputType, input, attrs);

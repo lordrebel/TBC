@@ -3,6 +3,7 @@
 #include "dialects/kernels/IR/kernels.h"
 #include "dialects/operators/IR/operator.h"
 #include "dialects/operators/transforms/pass.h"
+#include "dialects/kernels/transforms/pass.h"
 #include "conversions/conversion.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/PDL/IR/PDL.h"
@@ -23,5 +24,6 @@ void registerAllPasses() {
   registerCanonicalizer();
   mlir::registerConversionPasses();
   ops::registeropPasses();
+  kls::registeropPasses();
 }
 } // namespace tbc

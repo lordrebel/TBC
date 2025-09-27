@@ -245,7 +245,7 @@ def Kernel_ConcatOp: Kernel_Op<"Concat",[]> {
 
   let arguments = (ins
     Variadic<AnyRankedTensor>:$inputs,
-    I64Attr:$axis,
+    SI32Attr:$axis,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
     DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit
   );
@@ -283,7 +283,7 @@ def Kernel_EltWiseConstOp: Kernel_Op<"EltwiseConst",[]> {
 
   let arguments = (ins
     AnyRankedTensor:$input,
-    F64Attr:$right,
+    F64Attr:$const_val,
     EltwiseModeAttr:$mode,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
     DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit

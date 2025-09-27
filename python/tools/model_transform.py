@@ -13,10 +13,11 @@ from utils.auto_remove import file_mark, file_clean
 
 class ModelTransformer(object):
 
-    def __init__(self, model_name, model_path,without_simplfy=False):
+    def __init__(self, model_name, model_path,chip,without_simplfy=False):
         self.model_name = model_name
         self.model_path = model_path
         self.converter = BaseConverter()
+        self.chip = chip
         self.without_simplfy = without_simplfy
 
     def cleanup(self):
@@ -36,9 +37,12 @@ class ModelTransformer(object):
     def model_transform(self, mlir_file: str):
         self.mlir_file = mlir_file
         mlir_origin = mlir_file.replace('.mlir', '_origin.mlir', 1)
+        ops_mlir = mlir_file.replace('.mlir', '_ops.mlir', 1)
         file_mark(mlir_origin)
+        file_mark(ops_mlir)
         self.converter.generate_mlir(mlir_origin)
-        mlir_opt_for_operator(mlir_origin, self.mlir_file)
+        mlir_opt_for_operator(mlir_origin, ops_mlir)
+        mlir_lowering_to_kernel(ops_mlir, self.mlir_file, self.chip)
         print("Mlir file generated:{}".format(mlir_file))
 
         self.module_parsered = MlirParser(self.mlir_file)
@@ -55,12 +59,13 @@ class OnnxTransformer(ModelTransformer):
     def __init__(self,
                  model_name,
                  model_path,
+                 chip,
                  mode="F32",
                  input_shapes: list = [],
                  output_names: list = [],
                  without_simplfy=False,
                  onnx_sim=''):
-        super().__init__(model_name, model_path,without_simplfy)
+        super().__init__(model_name, model_path,chip,without_simplfy)
         from transform.OnnxConverter import OnnxConverter
         self.converter = OnnxConverter(self.model_name,
                                        self.model_path,
@@ -79,12 +84,13 @@ class SvJsonTransformer(ModelTransformer):
     def __init__(self,
                  model_name,
                  model_path,
+                 chip,
                  mode="F32",
                  input_shapes: list = [],
                  output_names: list = [],
                  without_simplfy=False,
                  onnx_sim=''):
-        super().__init__(model_name, model_path,without_simplfy)
+        super().__init__(model_name, model_path,chip,without_simplfy)
         from transform.SVjsonConverter import SvJsonConverter
         self.converter = SvJsonConverter(self.model_name,
                                        self.model_path,
@@ -101,12 +107,13 @@ class TorchTransformer(ModelTransformer):
     def __init__(self,
                  model_name,
                  model_path,
+                 chip,
                  mode="F32",
                  input_shapes: list = [],
                  input_types: list = [],
                  output_names: list = [],
                  without_simplfy=False):
-        super().__init__(model_name, model_path,without_simplfy)
+        super().__init__(model_name, model_path,chip,without_simplfy)
         from transform.TorchConverter import TorchConverter
         self.converter = TorchConverter(self.model_name,
                                        self.model_path,
@@ -126,16 +133,17 @@ def get_model_transform(args):
     if args.platform=="onnx":
         tool = OnnxTransformer(args.model_name,
                                args.model_path,
+                               args.chip,
                                args.mode,
                                args.input_shapes,
                                args.output_names,
                                args.without_simplfy,
                                onnx_sim=args.onnx_sim)
     elif args.platform == "torch":
-        tool = TorchTransformer(args.model_name, args.model_path, args.mode,args.input_shapes,
+        tool = TorchTransformer(args.model_name, args.model_path, args.chip,args.mode,args.input_shapes,
                                 args.input_types, args.output_names,args.without_simplfy)
     elif args.platform == "svjson":
-        tool = SvJsonTransformer(args.model_name, args.model_path, args.mode,args.input_shapes,
+        tool = SvJsonTransformer(args.model_name, args.model_path, args.chip,args.mode,args.input_shapes,
                                  args.output_names, args.without_simplfy)
 
     else:
@@ -152,6 +160,8 @@ if __name__ == '__main__':
     parser.add_argument("--model_path", required=True, help="model definition file.")
     parser.add_argument("--platform", type=str, required=True,choices=["onnx", "torch","svjson"],
                         help="model platform, like:onnx,torch")
+    parser.add_argument("--chip", type=str, required=True,choices=["npu_v1","npu_v1"],
+                        help="compile target chip, like:npu_v1,NPU_npu_v2")
     parser.add_argument("--mode",type=str,default="F32",choices=["INT8","UINT8","INT4","BF16","F16","F32","W8F16","W8BF16","W4F16","W4BF16","F8E4M3","F8E5M2","W4F8E4M3","W4F8E5M2",],
                         help="the precision of model, like:INT8,UINT8,INT4,BF16,F16,F32,W8F16,W8BF16,W4 default is F32")
     parser.add_argument("--input_shapes", type=str2shape, default=list(),

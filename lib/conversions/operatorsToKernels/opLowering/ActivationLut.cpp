@@ -14,7 +14,7 @@ LogicalResult ActivationLutOpLowering::matchAndRewrite(tbc::ops::ActivationLutOp
   auto cal_mode=op.getCalMode();
   attrs.push_back(rewriter.getNamedAttr("lut_attr", kls::LutAttrAttr::get(rewriter.getContext(), sig_mode, bin_mode, cal_mode)));
   auto outputType = op.getOutput().getType();
-  rewriter.replaceOpWithNewOp<tbc::kls::EltWiseConstOp>(op, outputType, input,attrs);
+  rewriter.replaceOpWithNewOp<tbc::kls::LutOp>(op, outputType, input,attrs);
   return success();
 }
 } // namespace tbc::ops
