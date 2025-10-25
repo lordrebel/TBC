@@ -14,7 +14,7 @@
 #include"support/utils.h"
 #include "support/log.h"
 
-#include "dialects/hals/IR/HalEnum.h.inc"
+#include "dialects/hals/IR/halsStructs.h"
 #include "dialects/hals/IR/HalsDialect.h.inc"
 #define GET_ATTRDEF_CLASSES
 #include "dialects/hals/IR/HalAttr.h.inc"

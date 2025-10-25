@@ -1130,9 +1130,6 @@ void saveWeight() {
       weightFile().save(filename_);
       m->setAttr(Attr::WEIGHT_FILE, StringAttr::get(ctx, filename_));
     }
-    if (wFile->empty()) {
-      m->setAttr(Attr::WEIGHT_FILE, StringAttr::get(ctx, ""));
-    }
     return;
   }
   if (wFile->changed() == false && same_name) {

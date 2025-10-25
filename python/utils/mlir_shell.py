@@ -75,7 +75,9 @@ def mlir_opt_for_kernel(kls_mlir: str,
     pass
 def mlir_lowering_to_hal(kls_mlir: str,
                   hals_mlir: str):
-    pass
+    cmd = ["tbc-opt", kls_mlir, "--convert-kernels-to-hals","--assign-tensorInfo"]
+    cmd.extend([" -o ",hals_mlir])
+    _os_system(cmd)
 
 def mlir_opt_for_hal(hals_mlir: str,
                     opt_hal_mlir: str):

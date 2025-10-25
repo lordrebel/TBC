@@ -97,10 +97,6 @@ class Operation:
 
     @staticmethod
     def append_attr(op, attrs):
-        if len(op.results) != 1:
-            return attrs
-        shape_type = mlir.ir.ShapedType(op.results[0].type)
-        element_type = shape_type.element_type
         return attrs
 
     @staticmethod
@@ -113,13 +109,72 @@ class Operation:
 
     @staticmethod
     def shape(op):
+        """获取操作的输出形状"""
         shape = []
         for result in op.results:
-            if str(result.type) != "none":
-                shape_type = mlir.ir.ShapedType(result.type)
-                shape = [shape_type.get_dim_size(i) for i in range(shape_type.rank)]
+            result_type_str = str(result.type)
+            if result_type_str == "none":
+                continue
+                
+            # 🎯 尝试不同的形状提取方法
+            shape = Operation._extract_shape(result.type, result_type_str)
+            if shape:
                 break
         return shape
+
+    @staticmethod
+    def _extract_shape(mlir_type, type_str):
+        """提取形状的核心方法"""
+        # 🎉 方法1：尝试标准 ShapedType
+        try:
+            shape_type = mlir.ir.ShapedType(mlir_type)
+            return [shape_type.get_dim_size(i) for i in range(shape_type.rank)]
+        except ValueError:
+            pass
+        
+        # 🎉 方法2：检查是否有直接的形状属性
+        try:
+            if hasattr(mlir_type, 'shape'):
+                return list(mlir_type.shape)
+            if hasattr(mlir_type, 'get_shape'):
+                return list(mlir_type.get_shape())
+        except:
+            pass
+        
+        # 🎉 方法3：字符串解析
+        return Operation._parse_shape_from_string(type_str)
+
+    @staticmethod
+    def _parse_shape_from_string(type_str):
+        """从类型字符串解析形状"""
+        import re
+        
+        # 🎯 HalTensorType: !hals.hal_tensor<1, 32, 16, 44 x f32,,,,>
+        hal_pattern = r'!hals\.hal_tensor<([0-9, ]+) x [^,>]+'
+        match = re.search(hal_pattern, type_str)
+        if match:
+            dims_str = match.group(1)
+            return [int(dim.strip()) for dim in dims_str.split(',') if dim.strip().isdigit()]
+        
+        # 🎯 标准 TensorType: tensor<1x32x16x44xf32>
+        tensor_pattern = r'tensor<([0-9x]+)x[^>]+>'
+        match = re.search(tensor_pattern, type_str)
+        if match:
+            dims_str = match.group(1)
+            return [int(dim) for dim in dims_str.split('x') if dim.isdigit()]
+        
+        # 🎯 其他格式
+        general_pattern = r'<([0-9, x]+)[^>]*>'
+        match = re.search(general_pattern, type_str)
+        if match:
+            dims_str = match.group(1)
+            # 处理逗号分隔或x分隔
+            if ',' in dims_str:
+                return [int(dim.strip()) for dim in dims_str.split(',') if dim.strip().isdigit()]
+            elif 'x' in dims_str:
+                return [int(dim.strip()) for dim in dims_str.split('x') if dim.strip().isdigit()]
+        
+        return []
 
     @staticmethod
     def operands(op, body, idx):

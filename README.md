@@ -51,10 +51,11 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 - [X] add torch converter
 - [X] add svjson converter
 - [X] add platform dependent pass for optmize imported model
-- [ ] test operator to kernel lowering
+- [X] test operator to kernel lowering
 - [ ] kernel dialect design
 - [ ] kernel pass design
 - [ ] hal pass design
+- [ ] add pass for hal to assign tensorKind
 - [ ] hal dialect design
 - [ ] infernece pass design
 - [ ] toTOSA conversion

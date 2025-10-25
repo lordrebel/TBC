@@ -4,7 +4,14 @@ namespace tbc::npuv1 {
 
   void populateKernelsToHalsConversionPatterns(mlir::RewritePatternSet &patterns,
                                            mlir::TypeConverter &typeConverter){
-      llvm_unreachable("Not Implemented");
+      patterns.add<
+        InputOpLowering,
+        WeightOpLowering,
+        EltWiseOpLowering,
+        EltWiseConstOpLowering,
+        LutOpLowering,
+        ReturnOpLowering
+      >(typeConverter, patterns.getContext());
     }
 
 } // namespace tbc::npuV1

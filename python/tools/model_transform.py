@@ -38,11 +38,15 @@ class ModelTransformer(object):
         self.mlir_file = mlir_file
         mlir_origin = mlir_file.replace('.mlir', '_origin.mlir', 1)
         ops_mlir = mlir_file.replace('.mlir', '_ops.mlir', 1)
+        kls_mlir = mlir_file.replace('.mlir', '_kls.mlir', 1)
         file_mark(mlir_origin)
         file_mark(ops_mlir)
+        file_mark(kls_mlir)
         self.converter.generate_mlir(mlir_origin)
         mlir_opt_for_operator(mlir_origin, ops_mlir)
-        mlir_lowering_to_kernel(ops_mlir, self.mlir_file, self.chip)
+        mlir_lowering_to_kernel(ops_mlir, kls_mlir, self.chip)
+
+        mlir_lowering_to_hal(kls_mlir, mlir_file)
         print("Mlir file generated:{}".format(mlir_file))
 
         self.module_parsered = MlirParser(self.mlir_file)

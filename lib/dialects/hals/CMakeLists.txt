@@ -15,6 +15,7 @@ add_mlir_library(TBCHals
   MLIRKernelsIncGen
 	MLIRHalsIncGen
 	MLIRHalAttrGen
+  MLIRHalDialectPassIncGen
 
   LINK_LIBS PUBLIC
   MLIRIR
