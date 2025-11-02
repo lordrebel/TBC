@@ -55,7 +55,7 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 - [ ] kernel dialect design
 - [ ] kernel pass design
 - [ ] hal pass design
-- [ ] add pass for hal to assign tensorKind
+- [X] add pass for hal to assign tensorKind
 - [ ] hal dialect design
 - [ ] infernece pass design
 - [ ] toTOSA conversion

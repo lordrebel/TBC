@@ -67,7 +67,7 @@ def mlir_lowering_to_kernel(ops_mlir: str,
                   chip: str):
     
     cmd = ["tbc-opt", ops_mlir, "--convert-operators-to-kernels" ]
-    cmd.extend([f"--assign-target=\"target={chip}\" ","-o", kernels_mlir])
+    cmd.extend([f"--assign-target=\"target={chip}\" ","--target-depend-pass"," -o", kernels_mlir])
     _os_system(cmd)
 
 def mlir_opt_for_kernel(kls_mlir: str,

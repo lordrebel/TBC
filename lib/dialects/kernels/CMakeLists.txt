@@ -2,6 +2,7 @@ file(GLOB _sources
           IR/*.cpp
           interfaces/*.cpp
           transforms/*.cpp
+          transforms/target/*.cpp
     )
 
 add_mlir_library(TBCKernels

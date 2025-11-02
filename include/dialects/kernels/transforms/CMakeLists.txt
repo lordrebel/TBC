@@ -13,3 +13,4 @@ install(FILES
 endif()
 
 add_public_tablegen_target(MLIRKernelDialectPassIncGen)
+add_subdirectory(target)

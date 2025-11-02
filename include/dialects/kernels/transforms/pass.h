@@ -17,7 +17,7 @@ namespace tbc {
 namespace kls {
 using mlir::ModuleOp;
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createAssginTargetPass();
-
+std::unique_ptr<mlir::OperationPass<ModuleOp>> createTargetDependentPass();
 #define GEN_PASS_REGISTRATION
 #define GEN_PASS_CLASSES
 #include "dialects/kernels/transforms/Passes.h.inc"

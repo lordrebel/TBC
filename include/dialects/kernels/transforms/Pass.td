@@ -13,4 +13,11 @@ def AssginTarget : Pass<"assign-target", "ModuleOp"> {
   ];
 }
 
+def TargetDependentPass : Pass<"target-depend-pass", "ModuleOp"> {
+  let summary = "target dependent pass for module op";
+  let constructor = "createTargetDependentPass()";
+  let dependentDialects = ["KernelDialect"];
+  let options = [];
+}
+
 #endif
