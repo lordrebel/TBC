@@ -1,4 +1,6 @@
 #ifndef TBC_KERNEL_DIALECT_TARGET_PASS
 #define TBC_KERNEL_DIALECT_TARGET_PASS
 
+include "mlir/Pass/PassBase.td"
+
 #endif 

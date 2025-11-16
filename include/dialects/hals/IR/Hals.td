@@ -4,7 +4,8 @@ include "mlir/IR/AttrTypeBase.td"
 include "mlir/IR/OpBase.td"
 include "mlir/IR/EnumAttr.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
-
+include "interfaces/MemInfoInferInterface.td"
+include "traits/Traits.td"
 // =============================================================================
 //
 // Defines Hal Dialect.
@@ -463,6 +464,70 @@ def Hal_WeightOp : Hal_BaseOp<"Weight"> {
   mlir::Value split(int begin, int end, int axis, mlir::Type to_type, std::string suffix);
   }];
 }
+
+def Hal_PackWeightOp: Hal_BaseOp<"PackWeight"> {
+  let summary = "pack weight operator";
+
+  let description = [{
+    Pack weight tensor into a compact representation for efficient storage and access.
+  }];
+
+  let arguments = (ins
+  );
+  let regions = (region SizedRegion<1>:$body);
+  let results = (outs Variadic<AnyHalTensor>:$outputs);
+  let hasCanonicalizer = 0;
+  let hasVerifier = 0;  //todo
+  let extraClassDeclaration = [{
+   //TODO
+  }];
+}
+
+def Hal_TileOp : Hal_BaseOp<"Tile",
+                            [MemInfoInferInput2Output,
+                            DeclareOpInterfaceMethods<MemInfoInferInterface,["infer_from_input_to_output"]>]> {
+  let summary = "tile operator";
+  let description = [{
+    
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input,
+    I64ArrayAttr:$start_idx,  //nchw
+    I64ArrayAttr:$slice    //nchw
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
+}
+
+def Hal_MergeOp : Hal_BaseOp<"Merge",
+                            [MemInfoInferOutput2Input,
+                             DeclareOpInterfaceMethods<MemInfoInferInterface,["infer_from_output_to_input"]>]> {
+  let summary = "tile operator";
+  let description = [{
+    
+  }];
+  let arguments = (ins
+    Variadic<AnyHalTensor>:$inputs,
+    SI32Attr:$axis
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
+}
+
+def Hal_ViewOp : Hal_BaseOp<"View",
+                    [SupportInplace]> {
+  let summary = "view operator";
+  let description = [{
+    
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input,
+    I64ArrayAttr:$new_shape
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
+}
+
 
 def Hal_EltwiseOp: Hal_Op<"Eltwise"> {
   let summary = "element-wise operator";

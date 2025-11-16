@@ -17,6 +17,7 @@ add_mlir_library(TBCKernels
 	MLIROperatorsIncGen
   MLIRKernelsIncGen
   MLIRKernelDialectPassIncGen
+  MLIRTargetPassIncGen
 
   LINK_LIBS PUBLIC
   MLIRIR
