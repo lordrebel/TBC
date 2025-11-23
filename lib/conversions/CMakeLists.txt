@@ -1,2 +1,2 @@
-add_subdirectory(OperatorsToKernels)
-add_subdirectory(KernelsToHals)
+add_subdirectory(operatorsToKernels)
+add_subdirectory(kernelsToHals)

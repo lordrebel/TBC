@@ -1,4 +1,4 @@
-#include"dialects/hals/IR/Hals.h"
+#include"dialects/hals/IR/hals.h"
 #include "dialects/hals/IR/hals.h"
 
 namespace tbc::hals {

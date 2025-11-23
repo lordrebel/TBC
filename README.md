@@ -28,7 +28,7 @@ cmake --build . --target install
 ### 3. install omp
 
 ```bash
-sudo apt-get install libgomp-dev
+sudo apt-get install libomp-dev
 ```
 
 ### 4. build

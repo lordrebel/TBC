@@ -308,7 +308,10 @@ struct FuseScaleIntoConv : public OpRewritePattern<ScaleOp> {
               filterData->at(i * innerSize + j) * scaleVec.at(i);
         }
       }
-      filterOp.update(newFilter, newFilter.size());
+      auto res=filterOp.update(newFilter, newFilter.size());
+      if(res.failed()){
+        return failure();
+      }
     }
     if (sBias) {
       // merge SBias into conv's bias
@@ -331,7 +334,9 @@ struct FuseScaleIntoConv : public OpRewritePattern<ScaleOp> {
         for (int i = 0; i < c; ++i) {
           newBiasVec[i] += cBiasData->at(i) * scaleVec[i];
         }
-        cBiasOp.update(newBiasVec, c);
+        if(cBiasOp.update(newBiasVec, c).failed()){
+          return failure();
+        }
       } else {
         auto newBiasOp = WeightOp::create(
             convOp, module::getName(sBias, 0).str(), newBiasVec, newBiasType);

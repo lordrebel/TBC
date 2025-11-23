@@ -1,4 +1,4 @@
-set(LLVM_TARGET_DEFINITIONS pass.td)
+set(LLVM_TARGET_DEFINITIONS Pass.td)
 mlir_tablegen(Passes.h.inc -gen-pass-decls -name op)
 
 if(BUILD_DOC)
