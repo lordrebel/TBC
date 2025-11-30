@@ -32,6 +32,9 @@ namespace tbc::ops {
     OPLOWERING(ReluOp);
     OPLOWERING(ActivationLutOp);
     OPLOWERING(ConcatOp);
+    OPLOWERING(ConvOp);
+    OPLOWERING(PadOp);
+    OPLOWERING(MaxPoolOp);
 void populateOperatorsToKernelsConversionPatterns(
     mlir::RewritePatternSet &patterns);
 } // namespace tbc::ops

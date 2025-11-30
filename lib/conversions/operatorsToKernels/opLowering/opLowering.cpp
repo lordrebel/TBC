@@ -14,7 +14,10 @@ namespace tbc::ops{
         DivOpLowering,
         ReluOpLowering,
         ActivationLutOpLowering,
-        ConcatOpLowering
+        ConcatOpLowering,
+        ConvOpLowering,
+        PadOpLowering,
+        MaxPoolOpLowering
       >(patterns.getContext());
     }
 

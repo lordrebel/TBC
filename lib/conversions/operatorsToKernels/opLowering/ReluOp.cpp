@@ -10,8 +10,9 @@ LogicalResult ReluOpLowering::matchAndRewrite(tbc::ops::ReluOp op,
   auto input = op.getInput();
   std::vector<NamedAttribute> attrs;
   auto outputType = op.getOutput().getType();
-  attrs.push_back(
-      rewriter.getNamedAttr("mode", rewriter.getStringAttr("RELU")));
+  attrs.push_back(rewriter.getNamedAttr(
+      "mode", kls::ActiveModeAttr::get(
+                  getContext(), kls::symbolizeActiveMode("RELU").value())));
   rewriter.replaceOpWithNewOp<tbc::kls::ActiveOp>(op, outputType, input, attrs);
   return success();
 }

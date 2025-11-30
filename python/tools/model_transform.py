@@ -46,6 +46,7 @@ class ModelTransformer(object):
         mlir_opt_for_operator(mlir_origin, ops_mlir)
         mlir_lowering_to_kernel(ops_mlir, kls_mlir, self.chip)
 
+        #need modify for lenet
         mlir_lowering_to_hal(kls_mlir, mlir_file)
         print("Mlir file generated:{}".format(mlir_file))
 

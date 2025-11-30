@@ -28,7 +28,10 @@ cmake --build . --target install
 ### 3. install omp
 
 ```bash
+#for gcc
 sudo apt-get install libomp-dev
+#for clang-20
+sudo apt install libomp-20-dev
 ```
 
 ### 4. build
@@ -54,6 +57,9 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 - [X] test operator to kernel lowering
 - [ ] kernel dialect design
 - [ ] kernel pass design
+- [ ] kernel op fuse pass
+- [ ] kernel active to lut op
+- [ ] lenet from kernel dialect lowering to hal dialect
 - [ ] hal pass design
 - [X] add pass for hal to assign tensorKind
 - [ ] hal dialect design

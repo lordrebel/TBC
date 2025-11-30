@@ -53,7 +53,20 @@ def HaL_CompareMode :I32EnumAttr<"CompareMode", "HAL compare mode", [
   let cppNamespace = "::tbc::hals";
   let genSpecializedAttr = 0;
 }
+
 def Hal_CompareModeAttr : EnumAttr<Hal_Dialect, HaL_CompareMode, "CompareOpMode" >;
+
+def Hal_ConcatMode : I32EnumAttr<"ConcatMode", "HAL concat mode", [
+  I32EnumAttrCase<"N", 0, "N">,
+  I32EnumAttrCase<"C", 1, "C">,
+  I32EnumAttrCase<"H", 2, "H">,
+  I32EnumAttrCase<"W", 3, "W">,
+  ]> {
+  let cppNamespace = "::tbc::hals";
+  let genSpecializedAttr = 0;
+}
+
+def Hal_ConcatModeAttr : EnumAttr<Hal_Dialect, Hal_ConcatMode, "Concat_Mode">;
 
 def Hal_EltwiseMode : I32EnumAttr<"EltwiseMode", "HAL eltwise mode", [
   I32EnumAttrCase<"Add", 0, "Add">,
@@ -110,6 +123,30 @@ def Hal_StorageLayout : I32EnumAttr<"StorageLayout", "HAL storage layout", [
   let cppNamespace = "::tbc::hals";
   let genSpecializedAttr = 0;
 }
+
+def Hal_Padmode:I32EnumAttr<"Padmode", "HAL pad mode",  [
+      I32EnumAttrCase<"no_pad", 0>,
+      I32EnumAttrCase<"constant", 1>,
+      I32EnumAttrCase<"reflect", 2>,
+      I32EnumAttrCase<"edge", 3>,
+      I32EnumAttrCase<"symmetric", 4>,
+    ]> {
+  let cppNamespace = "::tbc::hals";
+  let genSpecializedAttr = 0;
+}
+
+def Hal_PadmodeAttr : EnumAttr<Hal_Dialect, Hal_Padmode, "Pad_Mode">;
+
+def Hal_PoolMode: I32EnumAttr<"PoolMode",
+    "pooling mode supported by PoolOp",
+    [
+      I32EnumAttrCase<"Avg", 0>,
+      I32EnumAttrCase<"Max", 1>,
+    ]>{
+  let genSpecializedAttr = 0;
+  let cppNamespace = "::tbc::hals";
+}
+def Hal_PoolModeAttr : EnumAttr<Hal_Dialect, Hal_PoolMode, "pool_mode">;
 
 def Hal_StorageLayoutAttr : EnumAttr<Hal_Dialect, Hal_StorageLayout, "Storage_Layout">;
 
@@ -528,6 +565,47 @@ def Hal_ViewOp : Hal_BaseOp<"View",
   let results = (outs AnyHalTensor:$output);
 }
 
+def Hal_Conv2dOp: Hal_Op<"Conv2d"> {
+  let summary = "conv2d operator";
+  let description = [{
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input,
+    AnyHalTensor:$weight,
+    AnyHalTensorOrNone:$bias,
+    AnyHalTensorOrNone:$lut_k,
+    AnyHalTensorOrNone:$lut_x,
+    AnyHalTensorOrNone:$lut_y,
+    I64ArrayAttr:$strides,
+    I64ArrayAttr:$pads,
+    I64ArrayAttr:$dilations,
+    SI32Attr:$groups,
+    Hal_PadmodeAttr:$pad_mode,
+    DefaultValuedAttr<BoolAttr, "false">:$fused_lut,
+    OptionalAttr<Hal_LutAttr>:$lut_attr,
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
+  );
+}
+
+def Hal_ConcatOp: Hal_Op<"Concat",[]> {
+  let summary = "concat operator";
+
+  let description = [{
+     The operator for compare function
+  }];
+
+  let arguments = (ins
+    AnyHalTensor:$input1,
+    AnyHalTensor:$input2,
+    Hal_ConcatModeAttr:$mode,
+    DefaultValuedAttr<BoolAttr, "false">:$do_relu,
+    DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
+     OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
+  );
+
+  let results = (outs AnyRankedTensor:$output);
+  let hasVerifier = 0;
+}
 
 def Hal_EltwiseOp: Hal_Op<"Eltwise"> {
   let summary = "element-wise operator";
@@ -557,6 +635,24 @@ def Hal_EltwiseConstOp: Hal_Op<"EltwiseConst"> {
     Hal_EltwiseModeAttr:$mode,
     DefaultValuedAttr<BoolAttr, "false">:$do_relu,
     DefaultValuedAttr<F64Attr, "-1.0">:$relu_limit,
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
+}
+
+def Hal_Pool2dOp: Hal_Op<"Pool2d"> {
+  let summary = "pool2d operator";
+  let description = [{
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input,
+    I64ArrayAttr:$kernel_size,
+    I64ArrayAttr:$strides,
+    Hal_PoolModeAttr:$pool_mode,
+    I64ArrayAttr:$pads,
+    Hal_PadmodeAttr:$pad_mode,
+    DefaultValuedAttr<BoolAttr, "false">:$ceil_mode,
     OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
   let hasCanonicalizer = 0;

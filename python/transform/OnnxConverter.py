@@ -6,7 +6,7 @@
 from .MLIRImporter import MLIRImporter, Platform
 from .BaseConverter import BaseConverter,ValueInfo
 from .OnnxOpt import onnx_opt, ConstantFolding
-from onnx import numpy_helper, mapping
+from onnx import numpy_helper
 from numbers import Number
 from utils.auto_remove import file_mark, file_clean
 import onnx
@@ -16,6 +16,31 @@ import mlir.dialects.operators as operators
 from mlir.ir import *
 from typing import List
 import onnxsim.onnx_simplifier as onnxsim
+
+try:
+    # 尝试新版本的导入方式
+    from onnx import TensorProto
+    TENSOR_TYPE_TO_NP_TYPE = {
+        TensorProto.FLOAT: np.float32,
+        TensorProto.UINT8: np.uint8,
+        TensorProto.INT8: np.int8,
+        TensorProto.UINT16: np.uint16,
+        TensorProto.INT16: np.int16,
+        TensorProto.INT32: np.int32,
+        TensorProto.INT64: np.int64,
+        TensorProto.BOOL: np.bool_,
+        TensorProto.FLOAT16: np.float16,
+        TensorProto.DOUBLE: np.float64,
+        TensorProto.UINT32: np.uint32,
+        TensorProto.UINT64: np.uint64,
+        TensorProto.COMPLEX64: np.complex64,
+        TensorProto.COMPLEX128: np.complex128,
+        TensorProto.BFLOAT16: np.uint16,  # bfloat16 没有直接的numpy类型
+    }
+except:
+    # 如果上面的方式不行，用这个兜底
+    import onnx.mapping as mapping
+    TENSOR_TYPE_TO_NP_TYPE = mapping.TENSOR_TYPE_TO_NP_TYPE
 
 # Dictionary to translate ONNX attribute types to Python types
 onnx_attribute_translator = {
@@ -34,7 +59,7 @@ def onnx_data_type(dtype):
         onnx_dtype = onnx.TensorProto.DataType.Value(dtype)
     else:
         raise RuntimeError("dtype should be number or str.")
-    return mapping.TENSOR_TYPE_TO_NP_TYPE[onnx_dtype]
+    return TENSOR_TYPE_TO_NP_TYPE[onnx_dtype]
 
 
 def translate_onnx(key, val):
@@ -48,7 +73,7 @@ def onnx_dtype(dtype):
         onnx_dtype = onnx.TensorProto.DataType.Value(dtype)
     else:
         raise RuntimeError("dtype should be number or str.")
-    return mapping.TENSOR_TYPE_TO_NP_TYPE[onnx_dtype]
+    return TENSOR_TYPE_TO_NP_TYPE[onnx_dtype]
 
 
 def convert_onnx_attribute_proto(attr_proto):
