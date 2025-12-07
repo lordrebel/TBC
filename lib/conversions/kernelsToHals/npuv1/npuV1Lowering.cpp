@@ -10,7 +10,9 @@ namespace tbc::npuv1 {
         EltWiseOpLowering,
         EltWiseConstOpLowering,
         LutOpLowering,
-        ReturnOpLowering
+        ReturnOpLowering,
+        Conv2dOpLowering,
+        Pool2DOpLowering
       >(typeConverter, patterns.getContext());
     }
 

@@ -92,6 +92,8 @@ public:
     patterns.add<AssginTensorInfoForInputOp>(&getContext());
     patterns.add<AssginTensorInfoForWeightOp>(&getContext());
     
+    patterns.add<AssginTensorInfoForOp<hals::Conv2dOp>>(&getContext());
+    patterns.add<AssginTensorInfoForOp<hals::Pool2dOp>>(&getContext());
     patterns.add<AssginTensorInfoForOp<hals::EltwiseOp>>(&getContext());
     patterns.add<AssginTensorInfoForOp<hals::EltwiseConstOp>>(&getContext());
     patterns.add<AssginTensorInfoForOp<hals::LutOp>>(&getContext());

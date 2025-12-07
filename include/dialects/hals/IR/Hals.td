@@ -573,18 +573,26 @@ def Hal_Conv2dOp: Hal_Op<"Conv2d"> {
     AnyHalTensor:$input,
     AnyHalTensor:$weight,
     AnyHalTensorOrNone:$bias,
+    I64ArrayAttr:$kernel_shape,
     AnyHalTensorOrNone:$lut_k,
     AnyHalTensorOrNone:$lut_x,
     AnyHalTensorOrNone:$lut_y,
     I64ArrayAttr:$strides,
     I64ArrayAttr:$pads,
     I64ArrayAttr:$dilations,
-    SI32Attr:$groups,
+    SI32Attr:$group,
     Hal_PadmodeAttr:$pad_mode,
+    DefaultValuedAttr<BoolAttr,"false">:$do_winograd,
     DefaultValuedAttr<BoolAttr, "false">:$fused_lut,
     OptionalAttr<Hal_LutAttr>:$lut_attr,
     OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
   );
+  let hasCanonicalizer = 0;
+  let hasVerifier = 0;
+  let results = (outs AnyHalTensor:$output);
+  let extraClassDeclaration = [{
+    //TODO
+  }];
 }
 
 def Hal_ConcatOp: Hal_Op<"Concat",[]> {

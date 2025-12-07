@@ -1,6 +1,7 @@
 #pragma once
 #include "support/module.h"
 #include "support/utils.h"
+#include "dialects/kernels/IR/kernels.h"
 #include <mutex>
 namespace tbc::kls {
 class TargetDependentPassRegistry {
@@ -18,4 +19,12 @@ class TargetDependentPassRegistry {
 
 
 };
+
+
+using mlir::ModuleOp;
+std::unique_ptr<mlir::OperationPass<ModuleOp>> createExtraOptimizeNpuV1Pass();
+
+#define GEN_PASS_REGISTRATION
+#define GEN_PASS_CLASSES
+#include "dialects/kernels/transforms/target/TargetPass.h.inc"
 }

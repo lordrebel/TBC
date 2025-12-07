@@ -17,6 +17,9 @@ namespace tbc::npuv1 {
   KernelLowering(LutOp, 1);
   KernelLowering(EltWiseConstOp, 1);
   KernelLowering(ReturnOp, 1);
+  KernelLowering(Conv2dOp, 1);
+  KernelLowering(Pool2DOp, 1);
+
 
 
   void populateKernelsToHalsConversionPatterns(mlir::RewritePatternSet &patterns,

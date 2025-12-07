@@ -7,6 +7,7 @@ namespace tbc::kls {
 
   void RegisterNpuV1TargetPasses(mlir::PassManager & pm) {
     // Add NPU V1 specific passes here
+    pm.addPass(createExtraOptimizeNpuV1Pass());
   }
   void RegisterNpuV2TargetPasses(mlir::PassManager & pm) {
     // Add NPU V2 specific passes here
