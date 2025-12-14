@@ -580,7 +580,7 @@ def Hal_Conv2dOp: Hal_Op<"Conv2d"> {
     I64ArrayAttr:$strides,
     I64ArrayAttr:$pads,
     I64ArrayAttr:$dilations,
-    SI32Attr:$group,
+    I64Attr:$group,
     Hal_PadmodeAttr:$pad_mode,
     DefaultValuedAttr<BoolAttr,"false">:$do_winograd,
     DefaultValuedAttr<BoolAttr, "false">:$fused_lut,

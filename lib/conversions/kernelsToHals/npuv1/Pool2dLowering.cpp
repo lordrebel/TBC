@@ -69,10 +69,11 @@ Pool2DOpLowering::matchAndRewrite(Operation *op, ArrayRef<Value> operands,
 
   auto returnType = typeConverter->convertType(ori_type);
   //copy old attributes
-  attrs.push_back(rewriter.getNamedAttr("kernel_shape", pool2dOp.getKernelShapeAttr()));
+  attrs.push_back(rewriter.getNamedAttr("kernel_size", pool2dOp.getKernelShapeAttr()));
   attrs.push_back(rewriter.getNamedAttr("strides", pool2dOp.getStridesAttr()));
   attrs.push_back(rewriter.getNamedAttr("pads", pool2dOp.getPadsAttr()));
-  attrs.push_back(rewriter.getNamedAttr("pool_mode", pool2dOp.getPoolModeAttr()));
+  auto poolmode=hals::PoolModeAttr::get(getContext(), tbc::hals::symbolizePoolMode(tbc::kls::stringifyPoolMode(pool2dOp.getPoolMode())).value());
+  attrs.push_back(rewriter.getNamedAttr("pool_mode", poolmode));
   auto padmode=tbc::kls::stringifyPaddingMode(pool2dOp.getPadMode());
   auto hal_pad_mode=hals::PadmodeAttr::get(getContext(), tbc::hals::symbolizePadmode(padmode).value());
   attrs.push_back(rewriter.getNamedAttr("pad_mode", hal_pad_mode));
