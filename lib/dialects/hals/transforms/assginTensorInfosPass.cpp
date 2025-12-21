@@ -115,6 +115,7 @@ public:
           params.layout=hals::StorageLayout::nchw;
           params.memory_space=hals::MemorySpace::DDR;
           params.kind=hals::TensorKind::IO;
+          params.addr=-1;
           HalTensorType newHalTy = HalTensorType::get(funcOp->getContext(), params);
           newInputs.push_back(newHalTy);
         }else{

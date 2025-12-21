@@ -242,7 +242,7 @@ class MlirParser:
         for i in range(len(self.body.operations)):
             op = self.body.operations[i]
             type = Operation.type(op)
-            if type in ["operators.None", "operators.Weight", "func.return"]:
+            if type in ["operators.None", "operators.Weight","hals.Weight", "func.return"]:
                 if type == "func.return":
                     self.return_op = op
                 continue

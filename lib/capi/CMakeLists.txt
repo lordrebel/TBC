@@ -8,5 +8,7 @@ add_mlir_public_c_api_library(TBCCAPI
   LINK_LIBS PUBLIC
   MLIRIR
   TBCOperators
+  TBCKernels
+  TBCHals
   MLIRFuncDialect
 )

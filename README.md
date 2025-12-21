@@ -1,4 +1,12 @@
 # TODO
+## for ubuntu version> 24.04
+### 1. create venv
+```bash
+python3 -m venv ./pyenv
+source ./pyenv/bin/activate
+
+```
+
 ## pepare env
 ```bash
 source env.source

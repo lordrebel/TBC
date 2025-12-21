@@ -9,9 +9,11 @@
 
 #include "support/module.h"
 #include "dialects/operators/IR/operator.h"
+#include "dialects/hals/IR/hals.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/BuiltinTypes.h"
 #include "mlir/IR/OpDefinition.h"
+#include "mlir/IR/Operation.h"
 #include "mlir/IR/Value.h"
 #include "support/mathutil.h"
 #include "support/tensorfile.h"
@@ -265,7 +267,7 @@ static void removeUnusedOp(ModuleOp submodule) {
   for (auto func : submodule.getOps<FuncOp>()) {
     // for to support nested region's op
     func.walk<WalkOrder::PreOrder>([&](Operation *op) {
-      if (!isa<ReturnOp, FuncOp, ops::YieldOp>(op))
+      if (!isa<ReturnOp, FuncOp, ops::YieldOp,hals::ReturnOp>(op))
         all_ops.push_back(op);
     });
   }
@@ -1138,8 +1140,10 @@ void saveWeight() {
   std::set<StringRef> weight_names;
   for (auto s : *modules) {
     for (auto func : s.getOps<FuncOp>()) {
-      func.walk([&](ops::WeightOp op) {
-        weight_names.insert(module::getName(op.getOperation()));
+      func.walk([&](Operation *op) {
+        if(isa<ops::WeightOp,hals::WeightOp>(op) == false)
+          return;
+        weight_names.insert(module::getName(op));
       });
     }
   }

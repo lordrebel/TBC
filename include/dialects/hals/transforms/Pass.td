@@ -11,6 +11,14 @@ def AssginTensorInfos : Pass<"assign-tensorInfo", "ModuleOp"> {
   ];
 }
 
+def PackWeightsPass : Pass<"pack-weights", "FuncOp"> {
+  let summary = "pack weights for hals dialect";
+  let constructor = "createPackWeightsPass()";
+  let dependentDialects = ["HalDialect"];
+  let options = [
+  ];
+}
+
 
 
 #endif

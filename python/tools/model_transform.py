@@ -50,8 +50,8 @@ class ModelTransformer(object):
         mlir_lowering_to_hal(kls_mlir, mlir_file)
         print("Mlir file generated:{}".format(mlir_file))
 
-        self.module_parsered = MlirParser(self.mlir_file)
-        self.input_num = self.module_parsered.get_input_num()
+        # self.module_parsered = MlirParser(self.mlir_file)
+        # self.input_num = self.module_parsered.get_input_num()
 
 
     @abc.abstractmethod

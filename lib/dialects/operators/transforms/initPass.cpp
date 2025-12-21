@@ -19,6 +19,7 @@ class InitPass : public InitBase<InitPass> {
 public:
   InitPass() {}
   void runOnOperation() override {
+    tbc::support::initLogger();
     auto mOp = getOperation();
     module::init(mOp);
   }

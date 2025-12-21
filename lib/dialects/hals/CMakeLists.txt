@@ -12,11 +12,11 @@ add_mlir_library(TBCHals
 	${PROJECT_SOURCE_DIR}/include/dialects/hals
 
   DEPENDS
-  MLIRKernelsIncGen
 	MLIRHalsIncGen
 	MLIRHalAttrGen
   MLIRHalDialectPassIncGen
   MLIRMemInfoInferInterfaceIncGen
+  MLIRPackWeightInterfaceIncGen
 
   LINK_LIBS PUBLIC
   MLIRIR
@@ -27,5 +27,7 @@ add_mlir_library(TBCHals
   MLIRRewrite
   MLIRTransforms
 	MLIRTBCSupport
+  MLIRMemInfoInferInterface
+  MLIRPackWeightInterface
 
 )

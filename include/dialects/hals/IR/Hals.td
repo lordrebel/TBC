@@ -5,6 +5,7 @@ include "mlir/IR/OpBase.td"
 include "mlir/IR/EnumAttr.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 include "interfaces/MemInfoInferInterface.td"
+include "interfaces/PackWeightInterface.td"
 include "traits/Traits.td"
 // =============================================================================
 //
@@ -277,7 +278,7 @@ def Hal_TensorType : TypeDef<Hal_Dialect, "HalTensor"> {
     "mlir::Type":$elementType,
     DefaultValuedParameter<"MemorySpace", "MemorySpace::NOT_SET">:$memorySpace,
     DefaultValuedParameter<"StorageLayout", "StorageLayout::NOT_SET">:$layout,
-    DefaultValuedParameter<"int64_t", "-1">:$addr,
+    DefaultValuedParameter<"int64_t", "-1000">:$addr,
     DefaultValuedParameter<"TensorKind", "TensorKind::NOT_SET">:$kind,
     OptionalParameter<"CascadeAttr">: $cascade
 
@@ -428,38 +429,12 @@ def Hal_GroupOp: Hal_BaseOp<"Group">{
     Variadic<AnyHalTensor>:$outputs
   );
 
-    let regions = (region SizedRegion<1>:$body);
+  let regions = (region SizedRegion<1>:$body);
 
   let hasCanonicalizer = 0;
   let hasVerifier = 0;
 }
 
-// def Hal_ReturnOp : Hal_BaseOp< "Return", [
-//     Pure,                    
-//     HasParent<"mlir::func::FuncOp">,
-//     Terminator               
-//   ]> {
-//   let summary = "Custom return operation for operators dialect";
-//   let description = [{
-//     The `operators.return` operation represents a return operation within a function.
-//     It can optionally return values and supports additional metadata attributes.
-//   }];
-
-//   let arguments = (ins
-//     Variadic<IOHalTensor>:$operands
-//   );
-
-//   let results = (outs);
-
-//   // let assemblyFormat = [{
-//   //   ($operands^ `:` type($operands))? attr-dict
-//   // }];
-
-//   let hasCanonicalizer = 0;
-
-//   let hasVerifier = 0;
-
-// }
 
 def Hal_WeightOp : Hal_BaseOp<"Weight"> {
   let summary = "load weight operator";
@@ -502,7 +477,7 @@ def Hal_WeightOp : Hal_BaseOp<"Weight"> {
   }];
 }
 
-def Hal_PackWeightOp: Hal_BaseOp<"PackWeight"> {
+def Hal_PackedWeightGroupOp: Hal_BaseOp<"PackedWeightGroup"> {
   let summary = "pack weight operator";
 
   let description = [{
@@ -518,6 +493,14 @@ def Hal_PackWeightOp: Hal_BaseOp<"PackWeight"> {
   let extraClassDeclaration = [{
    //TODO
   }];
+}
+
+def Hal_ReturnOp : Hal_BaseOp<"Return", [Terminator, HasParent<"PackedWeightGroupOp">]> {
+  let summary = "Return values to parent operation";
+  let description = [{
+  }];
+
+  let arguments = (ins Variadic<AnyHalTensor>:$operands);
 }
 
 def Hal_TileOp : Hal_BaseOp<"Tile",
@@ -565,7 +548,7 @@ def Hal_ViewOp : Hal_BaseOp<"View",
   let results = (outs AnyHalTensor:$output);
 }
 
-def Hal_Conv2dOp: Hal_Op<"Conv2d"> {
+def Hal_Conv2dOp: Hal_Op<"Conv2d",[DeclareOpInterfaceMethods<PackWeightInterface>]> {
   let summary = "conv2d operator";
   let description = [{
   }];
@@ -615,7 +598,7 @@ def Hal_ConcatOp: Hal_Op<"Concat",[]> {
   let hasVerifier = 0;
 }
 
-def Hal_EltwiseOp: Hal_Op<"Eltwise"> {
+def Hal_EltwiseOp: Hal_Op<"Eltwise",[DeclareOpInterfaceMethods<PackWeightInterface>]> {
   let summary = "element-wise operator";
   let description = [{
     result = op1[i] op op2[i]
@@ -667,7 +650,7 @@ def Hal_Pool2dOp: Hal_Op<"Pool2d"> {
   let results = (outs AnyHalTensor:$output);
 }
 
-def Hal_LutOp : Hal_Op<"Lut"> {
+def Hal_LutOp : Hal_Op<"Lut",[DeclareOpInterfaceMethods<PackWeightInterface>]> {
   let summary = "lut operator";
   let description = [{
     result = lut_y[i] + lut_k[i] * (x - lut_x[i])
