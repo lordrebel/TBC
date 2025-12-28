@@ -41,8 +41,19 @@ sudo apt-get install libomp-dev
 #for clang-20
 sudo apt install libomp-20-dev
 ```
+### 4 ortools prepare
+#### 1. pull code
+```bash
+git clone --branch v9.14 --depth 1 https://github.com/google/or-tools.git
+```
+#### compile ortools
+```bash
+mkdir build &&cd build
+make -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld" -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld"  -S ../ -DBUILD_DEPS=ON -DCMAKE_BUILD_TYPE=Release   -DCMAKE_INSTALL_PREFIX=../ortools_release
+cmake --build .  --config Release --target install
+```
 
-### 4. build
+### 5. build
 ```bash
 bash build.sh
 ```
@@ -67,7 +78,8 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 - [ ] kernel pass design
 - [ ] kernel op fuse pass
 - [ ] kernel active to lut op
-- [ ] lenet from kernel dialect lowering to hal dialect
+- [X] lenet from kernel dialect lowering to hal dialect
+- [ ] finish packWeight Pass (pack all weight into weight group and address assgin)
 - [ ] hal pass design
 - [X] add pass for hal to assign tensorKind
 - [ ] hal dialect design

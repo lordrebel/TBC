@@ -3,6 +3,10 @@ if (POLICY CMP0116)
   cmake_policy(SET CMP0116 OLD)
 endif()
 
+if (POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif()
+
 project(tbc LANGUAGES CXX C)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -74,7 +78,9 @@ if(TBC_USE_LLD)
     CMAKE_EXE_LINKER_FLAGS CMAKE_MODULE_LINKER_FLAGS CMAKE_SHARED_LINKER_FLAGS)
 endif()
 #-------------------------------------------------------------------------------
-
+list(APPEND CMAKE_MODULE_PATH
+  ${PROJECT_SOURCE_DIR}/cmake
+)
 #-----------------third parties-------------------------------------------------
 #processbar
 set(PROGRESSBAR_PATH ${PROJECT_SOURCE_DIR}/3rdparty/progressbar)
@@ -82,6 +88,21 @@ include_directories(${PROGRESSBAR_PATH}/include)
 #cnpy
 set(CNPY_PATH ${PROJECT_SOURCE_DIR}/3rdparty/cnpy)
 include_directories(${CNPY_PATH})
+
+#ortools
+set(ORTOOLS_ROOT ${PROJECT_SOURCE_DIR}/../ortools_release)
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+include(FindOrtoolsDeps)
+find_package(ortools CONFIG REQUIRED 
+  HINTS ${PROJECT_SOURCE_DIR}/../ortools_release  ${PROJECT_SOURCE_DIR}/../ortools_release/lib/cmake ${PROJECT_SOURCE_DIR}/../ortools_release/lib/cmake/ortools ) 
+if(ortools_FOUND)
+  message(STATUS"found ortools")
+  if(NOT ORTOOLS_INCLUDE_DIRS)
+        set(ORTOOLS_INCLUDE_DIRS ${ORTOOLS_ROOT}/include)
+    endif()
+else()
+message(STATUS"not found ortools")
+endif()
 #-------------------------------------------------------------------------------
 
 #---------------generate version-----------------------------------------------
@@ -116,6 +137,7 @@ add_subdirectory(3rdparty)
 add_subdirectory(lib)
 add_subdirectory(tools)
 add_subdirectory(python)
+add_subdirectory(experimental)
 if(BUILD_DOC)
   add_subdirectory(docs)
 endif()
