@@ -494,10 +494,10 @@ def Hal_PackedWeightGroupOp: Hal_BaseOp<"PackedWeightGroup"> {
   let extraClassDeclaration = [{
     static PackedWeightGroupOp Merge(std::vector<PackedWeightGroupOp>& packedweight_groups);
     std::vector<std::pair<mlir::Value, mlir::Value>> getReturnValueMap();
-    std::vector<int64_t> getOffsets();
     llvm::LogicalResult ToNpzFile(const std::string& filename);
     llvm::LogicalResult ToBinFile(const std::string& filename);
-   //TODO
+    bool isContinuously(const std::vector<mlir::Value>& outputs);
+    std::vector<std::pair<mlir::Value, size_t>> getOffsets();
   }];
 }
 

@@ -79,7 +79,8 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 - [ ] kernel op fuse pass
 - [ ] kernel active to lut op
 - [X] lenet from kernel dialect lowering to hal dialect
-- [ ] finish packWeight Pass (pack all weight into weight group and address assgin)
+- [X] finish packWeight Pass (pack all weight into weight group and address assgin)
+- [ ] prototype of layergroupPass
 - [ ] hal pass design
 - [X] add pass for hal to assign tensorKind
 - [ ] hal dialect design

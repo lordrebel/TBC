@@ -73,15 +73,6 @@ PackedWeightGroupOp PackedWeightGroupOp::Merge(
   return group_op;
 }
 
-std::vector<int64_t> PackedWeightGroupOp::getOffsets() {
-  std::vector<int64_t> offsets = {};
-  int64_t offset = 0;
-  this->getBody().walk([&](hals::WeightOp op) {
-    offsets.push_back(offset);
-    offset += op.getByteSize();
-  });
-  return offsets;
-}
 
 std::vector<std::pair<mlir::Value, mlir::Value>>
 PackedWeightGroupOp::getReturnValueMap() {
@@ -241,5 +232,42 @@ PackedWeightGroupOp::ToBinFile(const std::string &filename) {
     return llvm::failure();
   }
   return llvm::success();
+}
+
+bool PackedWeightGroupOp::isContinuously(
+    const std::vector<mlir::Value> &outputs) {
+  auto totals = getOutputs();
+  if (outputs.size() < 2)
+    return true; // single output is always continuous
+  std::vector<size_t> idxs;
+  for (auto item : outputs) {
+    auto iter = std::find(totals.begin(), totals.end(), item);
+    if (iter == totals.end()) {
+      LOGE << ""
+              "Output tensor "
+           << item << " not found in packed_weight_group_op:"
+           << this->getOperationName() << "\n";
+      return false;
+    }
+    else{
+      idxs.push_back(iter - totals.begin());
+    }
+  }
+  sort(idxs.begin(), idxs.end());
+  for (size_t i = 1; i < idxs.size(); ++i) {
+    if (idxs[i]!= idxs[i - 1] + 1)
+      return false;
+  }
+  return true;
+}
+std::vector<std::pair<mlir::Value, size_t>> PackedWeightGroupOp::getOffsets(){
+  auto valueMap=getReturnValueMap();
+  int offset=0;
+  std::vector<std::pair<mlir::Value, size_t>> ans;
+  for(auto [idx,value]:llvm::enumerate(getOutputs())){
+    ans.push_back({value,offset});
+    offset+=valueMap[idx].second.getDefiningOp<hals::WeightOp>().getByteSize();
+  }
+  return ans;
 }
 } // namespace tbc::hals

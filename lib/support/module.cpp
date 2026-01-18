@@ -303,11 +303,16 @@ double getDtypeSize(Value v) {
 }
 
 int64_t getNumElements(Value v) {
-  if (isa<RankedTensorType>(v.getType()) == false) {
+  if (isa<RankedTensorType,hals::HalTensorType>(v.getType()) == false) {
     return 0;
   }
+  if (isa<RankedTensorType>(v.getType())) {
   auto type = cast<RankedTensorType>(v.getType());
-  return type.getNumElements();
+    return type.getNumElements();
+  } else {
+    auto type = cast<hals::HalTensorType>(v.getType());
+    return type.getNumElements();
+  }
 }
 
 llvm::ArrayRef<int64_t> getShape(Value v) {
@@ -419,6 +424,9 @@ Type getElementType(Value v) {
   } else if (isa<UnrankedTensorType>(type)) {
     auto rtype = cast<UnrankedTensorType>(type);
     return rtype.getElementType();
+  }else if(isa<hals::HalTensorType>(type)){
+    auto hType = cast<hals::HalTensorType>(type);
+    return hType.getElementType();
   }
   return type;
 }

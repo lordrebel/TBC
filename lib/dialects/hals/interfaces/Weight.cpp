@@ -3,6 +3,7 @@
 #include "dialects/hals/IR/halsStructs.h"
 #include "support/float16.h"
 #include "support/float8.h"
+#include "support/log.h"
 #include "support/module.h"
 #include "support/mathutil.h"
 #include <cstdint>
