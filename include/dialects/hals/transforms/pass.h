@@ -19,6 +19,7 @@ using mlir::ModuleOp;
 using mlir::func::FuncOp;
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createAssginTensorInfosPass();
 std::unique_ptr<mlir::OperationPass<FuncOp>> createPackWeightsPass();
+std::unique_ptr<mlir::OperationPass<FuncOp>> createFusePackedWeightGroupToOnePass();
 
 #define GEN_PASS_REGISTRATION
 #define GEN_PASS_CLASSES

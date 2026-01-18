@@ -266,6 +266,46 @@ template std::unique_ptr<std::vector<unsigned short>>
 TensorFile::readTensor<unsigned short>(llvm::StringRef name,
                                        RankedTensorType &type);
 
+template LogicalResult
+TensorFile::addTensor<float>(llvm::StringRef name,
+                             const float *data,
+                             std::vector<int64_t> &shape);
+
+template LogicalResult
+TensorFile::addTensor<int>(llvm::StringRef name,
+                          const int *data,
+                          std::vector<int64_t> &shape);
+
+template LogicalResult
+TensorFile::addTensor<unsigned char>(llvm::StringRef name,
+                                     const unsigned char *data,
+                                     std::vector<int64_t> &shape);
+
+template LogicalResult
+TensorFile::addTensor<signed char>(llvm::StringRef name,
+                                   const signed char *data,
+                                   std::vector<int64_t> &shape);
+
+template LogicalResult
+TensorFile::addTensor<short>(llvm::StringRef name,
+                            const short *data,
+                            std::vector<int64_t> &shape);
+
+template LogicalResult
+TensorFile::addTensor<unsigned short>(llvm::StringRef name,
+                                     const unsigned short *data,
+                                     std::vector<int64_t> &shape);
+
+template LogicalResult
+TensorFile::addTensor<int64_t>(llvm::StringRef name,
+                              const int64_t *data,
+                              std::vector<int64_t> &shape);
+
+template LogicalResult
+TensorFile::addTensor<unsigned int>(llvm::StringRef name,
+                                   const unsigned int *data,
+                                   std::vector<int64_t> &shape);
+
 /// read a tensor from file
 /// if the name is not found, return failure()
 /// type is provided for checking, return failure() if type does not match

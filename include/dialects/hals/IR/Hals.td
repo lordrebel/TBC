@@ -473,6 +473,7 @@ def Hal_WeightOp : Hal_BaseOp<"Weight"> {
   mlir::Value clone_f8e4m3(mlir::Operation *OwnerOp, bool per_channel_scale = false);
   mlir::Value clone_f8e5m2(mlir::Operation *OwnerOp);
   mlir::Value clone(llvm::StringRef suffix);
+  int64_t getByteSize();
   mlir::Value split(int begin, int end, int axis, mlir::Type to_type, std::string suffix);
   }];
 }
@@ -491,6 +492,11 @@ def Hal_PackedWeightGroupOp: Hal_BaseOp<"PackedWeightGroup"> {
   let hasCanonicalizer = 0;
   let hasVerifier = 0;  //todo
   let extraClassDeclaration = [{
+    static PackedWeightGroupOp Merge(std::vector<PackedWeightGroupOp>& packedweight_groups);
+    std::vector<std::pair<mlir::Value, mlir::Value>> getReturnValueMap();
+    std::vector<int64_t> getOffsets();
+    llvm::LogicalResult ToNpzFile(const std::string& filename);
+    llvm::LogicalResult ToBinFile(const std::string& filename);
    //TODO
   }];
 }

@@ -5,6 +5,7 @@
 #include "support/float8.h"
 #include "support/module.h"
 #include "support/mathutil.h"
+#include <cstdint>
 
 using namespace mlir;
 namespace tbc::hals {
@@ -447,5 +448,11 @@ mlir::Value WeightOp::split(int begin, int end, int axis, mlir::Type to_type,
   out_shape[axis] = end - begin;
   auto new_type = RankedTensorType::get(out_shape, to_type);
   return create(op, suffix, *out_weight, new_type);
+}
+
+int64_t WeightOp::getByteSize() {
+  auto num_elements=module::getNumElements(this->getOutput());
+  auto type = module::getElementType(this->getOutput());
+  return (num_elements*type.getIntOrFloatBitWidth())/8;
 }
 } // namespace tbc::hals

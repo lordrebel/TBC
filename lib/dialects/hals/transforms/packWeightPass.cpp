@@ -78,8 +78,6 @@ class PackWeightPass : public PackWeightsPassBase<PackWeightPass> {
     for (auto op : ops) {
       createWeightGroupOp(op);
     }
-    // assigin weight address here
-    // TODO
   }
 };
 

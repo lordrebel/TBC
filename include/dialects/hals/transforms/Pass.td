@@ -19,6 +19,12 @@ def PackWeightsPass : Pass<"pack-weights", "FuncOp"> {
   ];
 }
 
+def FusePackedWeightGroupToOnePass : Pass<"fuse-packed-weight-group-to-one", "FuncOp"> {
+  let summary = "fuse packed weight group to one";
+  let constructor = "createFusePackedWeightGroupToOnePass()";
+  let dependentDialects = ["HalDialect"]; 
+}
+
 
 
 #endif
