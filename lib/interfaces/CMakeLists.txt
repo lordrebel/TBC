@@ -4,6 +4,7 @@ set(
   TypeInferInterface.cpp
   MemInfoInferInterface.cpp
   PackWeightInterface.cpp
+  LayerGroupInterface.cpp
 )
 
 function(add_mlir_interface_library name)
@@ -27,4 +28,5 @@ add_mlir_interface_library(ShapeInferInterface)
 add_mlir_interface_library(TypeInferInterface)
 add_mlir_interface_library(MemInfoInferInterface)
 add_mlir_interface_library(PackWeightInterface)
+add_mlir_interface_library(LayerGroupInterface)
 

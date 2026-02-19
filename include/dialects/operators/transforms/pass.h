@@ -17,12 +17,14 @@
 namespace tbc {
 namespace ops {
 using mlir::ModuleOp;
+using mlir::func::FuncOp;
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createInitPass();
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createDeinitPass();
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createShapeInferPass();
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createTypeInferPass();
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createAssignCompilePhasePass();
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createPlatformDependentPass();
+std::unique_ptr<mlir::OperationPass<mlir::func::FuncOp>> createOpreorderPass();
 #define GEN_PASS_REGISTRATION
 #define GEN_PASS_CLASSES
 #include "dialects/operators/transforms/Passes.h.inc"

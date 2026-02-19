@@ -8,8 +8,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "support/module.h"
-#include "dialects/operators/IR/operator.h"
 #include "dialects/hals/IR/hals.h"
+#include "dialects/operators/IR/operator.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/BuiltinTypes.h"
 #include "mlir/IR/OpDefinition.h"
@@ -267,7 +268,8 @@ static void removeUnusedOp(ModuleOp submodule) {
   for (auto func : submodule.getOps<FuncOp>()) {
     // for to support nested region's op
     func.walk<WalkOrder::PreOrder>([&](Operation *op) {
-      if (!isa<ReturnOp, FuncOp, ops::YieldOp,hals::ReturnOp>(op))
+      if (!isa<ReturnOp, FuncOp, ops::YieldOp, hals::ReturnOp, hals::YieldOp>(
+              op))
         all_ops.push_back(op);
     });
   }
@@ -303,11 +305,11 @@ double getDtypeSize(Value v) {
 }
 
 int64_t getNumElements(Value v) {
-  if (isa<RankedTensorType,hals::HalTensorType>(v.getType()) == false) {
+  if (isa<RankedTensorType, hals::HalTensorType>(v.getType()) == false) {
     return 0;
   }
   if (isa<RankedTensorType>(v.getType())) {
-  auto type = cast<RankedTensorType>(v.getType());
+    auto type = cast<RankedTensorType>(v.getType());
     return type.getNumElements();
   } else {
     auto type = cast<hals::HalTensorType>(v.getType());
@@ -424,7 +426,7 @@ Type getElementType(Value v) {
   } else if (isa<UnrankedTensorType>(type)) {
     auto rtype = cast<UnrankedTensorType>(type);
     return rtype.getElementType();
-  }else if(isa<hals::HalTensorType>(type)){
+  } else if (isa<hals::HalTensorType>(type)) {
     auto hType = cast<hals::HalTensorType>(type);
     return hType.getElementType();
   }
@@ -892,6 +894,19 @@ ModuleOp getModuleOp() { return m; }
 Location getLoc() { return m.getLoc(); }
 
 MLIRContext *getCtx() { return ctx; }
+bool isOpInBlock(Operation *op) {
+  if (op == nullptr) {
+    return false;
+  }
+  auto parent = op->getParentOp();
+  if (parent == nullptr) {
+    return false;
+  }
+  if (isa<func::FuncOp>(parent)) {
+    return false;
+  }
+  return true;
+}
 
 uint32_t getIdx(Value v) {
   uint32_t idx = 0;
@@ -1112,12 +1127,14 @@ void saveWeight() {
   for (auto s : *modules) {
     for (auto func : s.getOps<FuncOp>()) {
       func.walk([&](Operation *op) {
-        if (dyn_cast<NameLoc>(op->getLoc()) &&
-            !isa<func::ReturnOp, func::CallOp, func::FuncOp, ops::InputOp>(
-                op)) {
+        if (dyn_cast<NameLoc>(op->getLoc()) && !module::isOpInBlock(op) &&
+            !isa<func::ReturnOp, func::CallOp, func::FuncOp, ops::InputOp,
+                 hals::YieldOp, hals::StoreOp, hals::LoadOp,
+                 hals::LoadWeightOp>(op)) {
           auto name = module::getName(op);
           // if op have more than two regions, it can have the same op Name
           if (all_names.find(name) != all_names.end()) {
+            LOGE<<"op:"<<module::getName(op)<<" name conflict with other op, please rename it\n";
             op->dump();
             llvm_unreachable("op name conflict");
           }
@@ -1149,7 +1166,7 @@ void saveWeight() {
   for (auto s : *modules) {
     for (auto func : s.getOps<FuncOp>()) {
       func.walk([&](Operation *op) {
-        if(isa<ops::WeightOp,hals::WeightOp>(op) == false)
+        if (isa<ops::WeightOp, hals::WeightOp>(op) == false)
           return;
         weight_names.insert(module::getName(op));
       });

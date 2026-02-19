@@ -105,6 +105,7 @@ bool isWeight(Value v);
 
 bool isAllWeight(Operation *op);
 bool isNone(Value v);
+bool isOpInBlock(Operation *op);
 Type DatatypeEnumToType(utils::DataType type, MLIRContext *ctx);
 utils::DataType TypeToDatatypeEnum(Type type);
 

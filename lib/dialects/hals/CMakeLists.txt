@@ -2,6 +2,7 @@ file(GLOB _sources
           IR/*.cpp
           interfaces/*.cpp
           transforms/*.cpp
+          transforms/layergroup/*.cpp 
     )
 
 add_mlir_library(TBCHals
@@ -17,6 +18,7 @@ add_mlir_library(TBCHals
   MLIRHalDialectPassIncGen
   MLIRMemInfoInferInterfaceIncGen
   MLIRPackWeightInterfaceIncGen
+  MLIRLayerGroupInterfaceIncGen
 
   LINK_LIBS PUBLIC
   MLIRIR
@@ -29,5 +31,6 @@ add_mlir_library(TBCHals
 	MLIRTBCSupport
   MLIRMemInfoInferInterface
   MLIRPackWeightInterface
+  MLIRLayerGroupInterface
 
 )

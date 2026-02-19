@@ -25,6 +25,14 @@ def FusePackedWeightGroupToOnePass : Pass<"fuse-packed-weight-group-to-one", "Fu
   let dependentDialects = ["HalDialect"]; 
 }
 
+def LayerGroupPass : Pass<"layer-group", "FuncOp"> {
+  let summary = "group layers for hals dialect";
+  let constructor = "createLayerGroupPass()";
+  let dependentDialects = ["HalDialect"];
+  let options = [
+  ];
+}
+
 
 
 #endif

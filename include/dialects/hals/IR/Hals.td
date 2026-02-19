@@ -5,6 +5,7 @@ include "mlir/IR/OpBase.td"
 include "mlir/IR/EnumAttr.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 include "interfaces/MemInfoInferInterface.td"
+include "interfaces/LayerGroupInterface.td"
 include "interfaces/PackWeightInterface.td"
 include "traits/Traits.td"
 // =============================================================================
@@ -437,7 +438,7 @@ def Hal_GroupOp: Hal_BaseOp<"Group">{
 
 
 def Hal_WeightOp : Hal_BaseOp<"Weight"> {
-  let summary = "load weight operator";
+  let summary = "weight operator";
 
   let description = [{
     Load weight from a file. The file should be a valid .npz format file.
@@ -511,7 +512,8 @@ def Hal_ReturnOp : Hal_BaseOp<"Return", [Terminator, HasParent<"PackedWeightGrou
 
 def Hal_TileOp : Hal_BaseOp<"Tile",
                             [MemInfoInferInput2Output,
-                            DeclareOpInterfaceMethods<MemInfoInferInterface,["infer_from_input_to_output"]>]> {
+                            DeclareOpInterfaceMethods<MemInfoInferInterface,["infer_from_input_to_output"]>,
+                            DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "tile operator";
   let description = [{
     
@@ -527,7 +529,8 @@ def Hal_TileOp : Hal_BaseOp<"Tile",
 
 def Hal_MergeOp : Hal_BaseOp<"Merge",
                             [MemInfoInferOutput2Input,
-                             DeclareOpInterfaceMethods<MemInfoInferInterface,["infer_from_output_to_input"]>]> {
+                             DeclareOpInterfaceMethods<MemInfoInferInterface,["infer_from_output_to_input"]>,
+                             DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "tile operator";
   let description = [{
     
@@ -541,7 +544,8 @@ def Hal_MergeOp : Hal_BaseOp<"Merge",
 }
 
 def Hal_ViewOp : Hal_BaseOp<"View",
-                    [SupportInplace]> {
+                    [SupportInplace,
+                    DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "view operator";
   let description = [{
     
@@ -554,7 +558,8 @@ def Hal_ViewOp : Hal_BaseOp<"View",
   let results = (outs AnyHalTensor:$output);
 }
 
-def Hal_Conv2dOp: Hal_Op<"Conv2d",[DeclareOpInterfaceMethods<PackWeightInterface>]> {
+def Hal_Conv2dOp: Hal_Op<"Conv2d",[DeclareOpInterfaceMethods<PackWeightInterface>,
+                                 DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "conv2d operator";
   let description = [{
   }];
@@ -584,7 +589,7 @@ def Hal_Conv2dOp: Hal_Op<"Conv2d",[DeclareOpInterfaceMethods<PackWeightInterface
   }];
 }
 
-def Hal_ConcatOp: Hal_Op<"Concat",[]> {
+def Hal_ConcatOp: Hal_Op<"Concat",[DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "concat operator";
 
   let description = [{
@@ -604,7 +609,8 @@ def Hal_ConcatOp: Hal_Op<"Concat",[]> {
   let hasVerifier = 0;
 }
 
-def Hal_EltwiseOp: Hal_Op<"Eltwise",[DeclareOpInterfaceMethods<PackWeightInterface>]> {
+def Hal_EltwiseOp: Hal_Op<"Eltwise",[DeclareOpInterfaceMethods<PackWeightInterface>,
+                                    DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "element-wise operator";
   let description = [{
     result = op1[i] op op2[i]
@@ -621,7 +627,8 @@ def Hal_EltwiseOp: Hal_Op<"Eltwise",[DeclareOpInterfaceMethods<PackWeightInterfa
   let results = (outs AnyHalTensor:$output);
 }
 
-def Hal_EltwiseConstOp: Hal_Op<"EltwiseConst"> {
+def Hal_EltwiseConstOp: Hal_Op<"EltwiseConst",
+                              [DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "element-wise operator";
   let description = [{
     result = op1[i] op op2[i]
@@ -638,7 +645,7 @@ def Hal_EltwiseConstOp: Hal_Op<"EltwiseConst"> {
   let results = (outs AnyHalTensor:$output);
 }
 
-def Hal_Pool2dOp: Hal_Op<"Pool2d"> {
+def Hal_Pool2dOp: Hal_Op<"Pool2d",[DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "pool2d operator";
   let description = [{
   }];
@@ -656,7 +663,8 @@ def Hal_Pool2dOp: Hal_Op<"Pool2d"> {
   let results = (outs AnyHalTensor:$output);
 }
 
-def Hal_LutOp : Hal_Op<"Lut",[DeclareOpInterfaceMethods<PackWeightInterface>]> {
+def Hal_LutOp : Hal_Op<"Lut",[DeclareOpInterfaceMethods<PackWeightInterface>,
+                              DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "lut operator";
   let description = [{
     result = lut_y[i] + lut_k[i] * (x - lut_x[i])
@@ -686,8 +694,21 @@ def Hal_LoadOp : Hal_Op<"Load"> {
   let results = (outs AnyHalTensor:$output);
 }
 
+def Hal_LoadWeightOp : Hal_Op<"LoadWeight"> {
+  let summary = "load weight operator";
+  let description = [{
+    load weight from ddr/L2 to l1 memory space
+  }];
+  let arguments = (ins
+    AnyHalTensor:$input,
+    OptionalAttr<Hal_HardwareInfoAttr>:$hw_info
+  );
+  let hasCanonicalizer = 0;
+  let results = (outs AnyHalTensor:$output);
+}
 
-def Hal_ScaleOp : Hal_Op<"Scale"> {
+
+def Hal_ScaleOp : Hal_Op<"Scale",[DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "scale operator";
   let description = [{
     res=input * scale+ bias
@@ -705,7 +726,7 @@ def Hal_ScaleOp : Hal_Op<"Scale"> {
   let results = (outs AnyHalTensor:$output);
 }
 
-def Hal_ScaleConstOp : Hal_Op<"ScaleConst"> {
+def Hal_ScaleConstOp : Hal_Op<"ScaleConst",[DeclareOpInterfaceMethods<LayerGroupInferInterface,[]>]> {
   let summary = "scale operator";
   let description = [{
     res=input * scale+ bias

@@ -15,6 +15,7 @@
 #include "support/log.h"
 #include "interfaces/memInfoInfer_interface.h"
 #include "interfaces/packweightInterface.h"
+#include "interfaces/LayergroupInterface.h"
 #include "dialects/hals/IR/halsStructs.h"
 #include "dialects/hals/IR/HalsDialect.h.inc"
 #define GET_ATTRDEF_CLASSES

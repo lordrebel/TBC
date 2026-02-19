@@ -74,6 +74,8 @@ model_transform.py --model_name lenet --model_path ./your/path/to/onnx --platfor
 - [X] add svjson converter
 - [X] add platform dependent pass for optmize imported model
 - [X] test operator to kernel lowering
+- [ ] opreorder pass
+- [X] simple layergroup pass
 - [ ] kernel dialect design
 - [ ] kernel pass design
 - [ ] kernel op fuse pass
