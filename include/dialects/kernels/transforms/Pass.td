@@ -20,4 +20,15 @@ def TargetDependentPass : Pass<"target-depend-pass", "ModuleOp"> {
   let options = [];
 }
 
+def OpReOrderPass : Pass<"op-reorder", "mlir::func::FuncOp"> {
+  let summary = "reorder ops for better performance";
+  let constructor = "createOpreorderPass()";
+  let dependentDialects = ["KernelDialect"];
+  let options = [
+    Option<"algo", "algo", "std::string",/*default=*/[{std::string("RPO")}],
+           "the sort order of reorder pass">,
+
+  ];
+}
+
 #endif

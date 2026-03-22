@@ -9,8 +9,11 @@
 
 #pragma once
 
+#include "dialects/operators/transforms/pass.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "dialects/kernels/IR/kernels.h"
+#include "mlir/Pass/Pass.h"
+#include <memory>
 
 
 namespace tbc {
@@ -18,6 +21,7 @@ namespace kls {
 using mlir::ModuleOp;
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createAssginTargetPass();
 std::unique_ptr<mlir::OperationPass<ModuleOp>> createTargetDependentPass();
+std::unique_ptr<mlir::OperationPass<mlir::func::FuncOp>> createOpreorderPass();
 #define GEN_PASS_REGISTRATION
 #define GEN_PASS_CLASSES
 #include "dialects/kernels/transforms/Passes.h.inc"

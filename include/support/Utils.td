@@ -112,4 +112,12 @@ def Module_Platform: I32EnumAttr<"Platform", "module platform",[
   let cppNamespace = "::tbc::utils";
 }
 
+def ReorderAlgo: I32EnumAttr<"ReorderAlgo", "reorder algorithm",[
+      I32EnumAttrCase<"RPO", 0>,
+      I32EnumAttrCase<"KAHN", 1>,
+    ]> {
+  let genSpecializedAttr = 0;
+  let cppNamespace = "::tbc::utils";
+}
+
 #endif // TPU_MLIR_MODULE_ATTR

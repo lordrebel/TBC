@@ -43,9 +43,4 @@ def PlatformDependent : Pass<"platform-opt", "ModuleOp"> {
   let dependentDialects = ["OperatorDialect"];
 }
 
-def Opreorder : Pass<"op-reorder", "FuncOp"> {
-  let summary = "reorder ops in function";
-  let constructor = "createOpreorderPass()";
-  let dependentDialects = ["OperatorDialect"];
-}
 #endif
