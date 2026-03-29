@@ -160,7 +160,9 @@ LogicalResult reorderOpsRPO(mlir::Block &block, mlir::MLIRContext *ctx) {
   llvm::DenseMap<mlir::Operation *, llvm::SetVector<mlir::Operation *>> predMap;
   mlir::DenseMap<mlir::Operation *, int64_t> depth_map;
   // 1. 利用 getUsers() 高效反推构建前驱图
+  llvm::SmallVector<mlir::Operation *> rootOps;
   for (mlir::Operation &op : block) {
+    bool is_root=false;
     if (&op == terminator)
       continue;
     for (mlir::Value result : op.getResults()) {
@@ -168,29 +170,37 @@ LogicalResult reorderOpsRPO(mlir::Block &block, mlir::MLIRContext *ctx) {
         mlir::Operation *userAncestor = getAncestorInBlock(user, &block);
         if (userAncestor && userAncestor != &op && userAncestor != terminator) {
           predMap[userAncestor].insert(&op);
+        }else{
+          is_root=true;
         }
       }
     }
+    if(is_root){
+      rootOps.push_back(&op);
+    }
     getMaxPath(&op, depth_map);
   }
-  // 2.根据路径长度排序，路径短的优先
+  // 2.根据路径长度排序，路径长的优先
   llvm::DenseMap<mlir::Operation *, llvm::SmallVector<mlir::Operation *, 4>> sortedPredMap;
 for (auto &item : predMap) {
     sortedPredMap[item.first] = item.second.takeVector(); // 取出底层 vector
     std::sort(sortedPredMap[item.first].begin(), sortedPredMap[item.first].end(),
               [&depth_map](mlir::Operation *a, mlir::Operation *b) {
-                  return depth_map[a] < depth_map[b];
+                  return depth_map[a] > depth_map[b];
               });
 }
 
   //3. rpo排序
     llvm::SmallPtrSet<mlir::Operation *, 32> visited;
     llvm::SmallVector<mlir::Operation *> sortedOps;
-
+    std::sort(rootOps.begin(), rootOps.end(),
+              [&depth_map](mlir::Operation *a, mlir::Operation *b) {
+                  return depth_map[a] > depth_map[b];
+              });
     // 2. DFS 遍历收集 RPO 序列
-    for (mlir::Operation &op : block) {
-        if (&op == terminator) continue;
-        dfsVisitWithPreds(&op, sortedPredMap, visited, sortedOps);
+    for (auto op : rootOps) {
+        if (op == terminator) continue;
+        dfsVisitWithPreds(op, sortedPredMap, visited, sortedOps);
     }
 
     // 3. 物理重排
